@@ -21,6 +21,9 @@ python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+If the project path contains a `:`, `venv` refuses to create `.venv` inside it. Create the
+environment elsewhere and link it: `python3.13 -m venv ~/.venvs/bpic17 && ln -s ~/.venvs/bpic17 .venv`.
+
 ## Reproduce
 
 ```bash
@@ -29,11 +32,23 @@ python src/stats.py          # Section 3.2: results/basic_stats.{csv,tex}, resul
 python src/figures_stats.py  # Section 3.2 figures -> figures/*.pdf
 ```
 
+## Report
+
+LaTeX sources in `report/` (TUM article template). The report reads figures from `figures/`
+and tables from `results/`, so rerun the scripts above before building.
+
+```bash
+cd report && latexmk -pdf main.tex
+```
+
+In VS Code, LaTeX Workshop builds on save into `report/build/` (see `.vscode/settings.json`).
+
 ## Structure
 
 ```
 src/        analysis scripts (one per report section)
 results/    computed tables and metrics (csv / tex / json)
 figures/    figures used in the report (pdf)
+report/     LaTeX sources of the report
 data/       event log (not versioned)
 ```

@@ -3,6 +3,16 @@ data/*
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
-.venv/
+.venv
 figures/*.png
 docs/
+.DS_Store
+report/build/
+report/*.aux
+report/*.log
+report/*.fls
+report/*.fdb_latexmk
+report/*.synctex.gz
+report/*.bbl
+report/*.blg
+report/*.out
