@@ -8,7 +8,6 @@ Local, not versioned: `data/BPI_Challenge_2017.xes.gz` (event log) and `docs/` (
 
 ## Rules that constrain how Claude helps
 
-- **GenAI policy:** Claude must not write whole sentences or paragraphs of the report. Help with code, analysis, structure, feedback, and tightening Max's own wording. The report needs a GenAI usage declaration.
 - Footnote every Python package/tool with a link; cite scientific literature properly.
 - Reproducibility: fix random seeds for data splits, document all ML parameters.
 - If a commercial tool computes quality metrics, a Python reimplementation is required.
