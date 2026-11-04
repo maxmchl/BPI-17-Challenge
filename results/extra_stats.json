@@ -1,0 +1,161 @@
+{
+  "log_period": [
+    "2016-01-01 09:51:15.304000+00:00",
+    "2017-02-01 14:11:03.499000+00:00"
+  ],
+  "event_attrs": {
+    "numeric": [
+      "FirstWithdrawalAmount",
+      "NumberOfTerms",
+      "MonthlyCost",
+      "CreditScore",
+      "OfferedAmount"
+    ],
+    "timestamp": [
+      "time:timestamp"
+    ],
+    "categorical": [
+      "Action",
+      "org:resource",
+      "concept:name",
+      "EventOrigin",
+      "lifecycle:transition",
+      "Accepted",
+      "Selected"
+    ],
+    "identifiers": [
+      "EventID",
+      "OfferID"
+    ]
+  },
+  "events_per_origin": {
+    "Workflow": 768823,
+    "Application": 239595,
+    "Offer": 193849
+  },
+  "lifecycle_values": {
+    "complete": 475306,
+    "suspend": 215402,
+    "schedule": 149104,
+    "start": 128227,
+    "resume": 127160,
+    "ate_abort": 85224,
+    "withdraw": 21844
+  },
+  "case_attr_values": {
+    "case:LoanGoal": {
+      "Car": 9328,
+      "Home improvement": 7669,
+      "Existing loan takeover": 5601,
+      "Other, see explanation": 2985,
+      "Unknown": 2365,
+      "Not speficied": 1065,
+      "Remaining debt home": 842,
+      "Extra spending limit": 625,
+      "Caravan / Camper": 369,
+      "Motorcycle": 275,
+      "Boat": 201,
+      "Tax payments": 152,
+      "Business goal": 30,
+      "Debt restructuring": 2
+    },
+    "case:ApplicationType": {
+      "New credit": 28120,
+      "Limit raise": 3389
+    }
+  },
+  "requested_amount": {
+    "count": 31509.0,
+    "mean": 16233.7,
+    "std": 15422.2,
+    "min": 0.0,
+    "25%": 6000.0,
+    "50%": 12500.0,
+    "75%": 21000.0,
+    "max": 450000.0
+  },
+  "variant_coverage": {
+    "25%": 44,
+    "50%": 1103,
+    "60%": 3327,
+    "70%": 6478,
+    "80%": 9629,
+    "90%": 12780
+  },
+  "singleton_variants": 13907,
+  "top_variant_share": 0.0335,
+  "offers_per_case": {
+    "1": 22950,
+    "2": 6578,
+    "3": 1348,
+    "4": 443,
+    "5": 126,
+    "6": 30,
+    "7": 16,
+    "8": 13,
+    "9": 3,
+    "10": 2
+  },
+  "outcome_counts": {
+    "A_Pending": 17228,
+    "A_Cancelled": 10431,
+    "A_Denied": 3752,
+    "none": 98
+  },
+  "duration_days_by_outcome": {
+    "A_Cancelled": {
+      "count": 10431.0,
+      "mean": 29.89,
+      "50%": 31.61,
+      "std": 12.45
+    },
+    "A_Denied": {
+      "count": 3752.0,
+      "mean": 16.8,
+      "50%": 14.09,
+      "std": 10.78
+    },
+    "A_Pending": {
+      "count": 17228.0,
+      "mean": 18.13,
+      "50%": 14.82,
+      "std": 11.69
+    },
+    "none": {
+      "count": 98.0,
+      "mean": 28.69,
+      "50%": 27.0,
+      "std": 21.0
+    }
+  },
+  "cases_without_outcome": 98,
+  "cases_without_outcome_last_event_within_30d_of_log_end": 97,
+  "duration_deciles_days": {
+    "p10": 7.87,
+    "p90": 35.05
+  },
+  "short_p10": {
+    "n": 3151,
+    "mean_len": 29.8,
+    "mean_offers": 1.2,
+    "outcomes": {
+      "A_Pending": 1766,
+      "A_Cancelled": 931,
+      "A_Denied": 435,
+      "none": 19
+    },
+    "top_variant": "A_Create Application > W_Complete application > W_Complete application > A_Concept > A_Accepted > O_Create Offer > O_Created > O_Sent (mail and online) > W_Complete application > W_Call after offers > W_Call after offers > A_Complete > W_Call after offers > W_Call after offers > W_Call after offers > W_Call after offers > W_Validate application > W_Validate application > A_Validating > O_Returned > W_Validate application > O_Accepted > A_Pending > W_Validate application"
+  },
+  "long_p90": {
+    "n": 3151,
+    "mean_len": 49.3,
+    "mean_offers": 1.92,
+    "outcomes": {
+      "A_Cancelled": 1579,
+      "A_Pending": 1346,
+      "A_Denied": 201,
+      "none": 25
+    },
+    "top_variant": "A_Create Application > A_Submitted > W_Handle leads > W_Handle leads > W_Complete application > A_Concept > W_Complete application > W_Complete application > W_Complete application > W_Complete application > A_Accepted > O_Create Offer > O_Created > O_Sent (mail and online) > W_Complete application > W_Call after offers > W_Call after offers > A_Complete > W_Call after offers > W_Call after offers > W_Call after offers > A_Cancelled > O_Cancelled > W_Call after offers"
+  }
+}
