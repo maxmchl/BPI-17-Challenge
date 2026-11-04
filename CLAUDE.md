@@ -8,6 +8,7 @@ Local, not versioned: `data/BPI_Challenge_2017.xes.gz` (event log) and `docs/` (
 
 ## Rules that constrain how Claude helps
 
+- GenAI: the professor relaxed the writing restriction from the assignment PDF, so Claude may help with report text. Max writes the report text himself. Keep the GenAI usage declaration in the report.
 - Footnote every Python package/tool with a link; cite scientific literature properly.
 - Reproducibility: fix random seeds for data splits, document all ML parameters.
 - If a commercial tool computes quality metrics, a Python reimplementation is required.
@@ -68,6 +69,8 @@ Abstract + intro ~0.6, setup ~0.3, statistics ~0.6, process model ~2, decision m
 ## Conventions
 
 - Scripts in `src/`, one per report section; tables in `results/`, figures in `figures/` (PDF for the report).
+- Report: LaTeX in `report/` (TUM template, `latexmk` via `report/latexmkrc`), built by LaTeX Workshop into `report/build/`; it reads `../figures/` and `../results/` directly.
+- Python env: `.venv` is a symlink to `~/.venvs/bpic17` (venv refuses paths containing `:`).
 - `python src/load.py` caches the log as `data/bpic17.parquet`; other scripts call `load_log()`.
 - Figures: one-column width 3.4 in, serif font, validated categorical palette `#2a78d6 #eb6834 #1baf7a #eda100` (fixed order).
 - Max prefers complete, runnable scripts and concise prose; explain concepts with concrete numbers first.
