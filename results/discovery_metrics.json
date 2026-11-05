@@ -77,6 +77,19 @@
     "t_fitness_tbr": 3.6094023750629276,
     "fitness_tbr": 1.0,
     "fit_traces_tbr_pct": 100.0,
+    "t_alignments": 1169.0554966250202,
+    "alignments_failed": 4,
+    "fitness_align": 0.9998756792855319,
+    "fit_traces_align_pct": 100.0,
+    "generalization_align": 0.9611771934822383,
+    "precision_tbr": 0.4624642984539057,
+    "t_precision_tbr": 28.136560415965505,
+    "generalization_tbr": 0.9611938162080462,
+    "t_generalization_tbr": 3.379324625013396,
+    "precision_align": 0.4624642984539057,
+    "t_precision_align": 4866.1998385409825,
+    "t_ext_cyclomatic": 3.3553472079802305,
+    "simp_ext_cyclomatic": 77728,
     "t_discovery": 0.6330600830260664
   }
 }

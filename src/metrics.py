@@ -60,7 +60,7 @@ def generalization_from_alignments(net, aligned_traces) -> float:
 
 
 # ---------------------------------------------------------------- alignments
-CORES = 4  # worker processes for alignments (PM4Py default: cpu_count - 2); keeps the laptop cool
+CORES = 6  # worker processes for alignments (= PM4Py default cpu_count - 2 on this 8-core machine)
 
 
 def precision_alignments(log, net, im, fm) -> float:
