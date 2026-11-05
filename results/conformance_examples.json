@@ -1,0 +1,103 @@
+{
+  "imf_generalization_gap": [
+    {
+      "transition": "skip_5",
+      "label": null,
+      "silent": true,
+      "tbr_firings": 0,
+      "alignment_firings": 3950,
+      "preset": [
+        "p_11"
+      ],
+      "postset": [
+        "p_10"
+      ]
+    },
+    {
+      "transition": "skip_11",
+      "label": null,
+      "silent": true,
+      "tbr_firings": 0,
+      "alignment_firings": 7665,
+      "preset": [
+        "p_19"
+      ],
+      "postset": [
+        "p_18"
+      ]
+    }
+  ],
+  "imf_trace_example": {
+    "variant_rank": 62,
+    "cases": 38,
+    "trace": [
+      "A_Create Application",
+      "A_Concept",
+      "A_Accepted",
+      "O_Create Offer",
+      "O_Created",
+      "O_Sent (online only)",
+      "A_Complete",
+      "A_Validating",
+      "O_Returned",
+      "O_Accepted",
+      "A_Pending"
+    ],
+    "tbr_fitness": 0.7886029411764706,
+    "tbr_missing": 3,
+    "tbr_remaining": 4,
+    "tbr_consumed": 16,
+    "tbr_produced": 17,
+    "align_fitness": 0.8947368421052632,
+    "align_cost": 20009,
+    "align_moves": [
+      "A_Create Application",
+      "A_Concept",
+      "A_Accepted",
+      "O_Create Offer",
+      "O_Created",
+      "[log: O_Sent (online only)]",
+      "[model: O_Sent (mail and online)]",
+      "A_Complete",
+      "A_Validating",
+      "O_Returned",
+      "O_Accepted",
+      "A_Pending"
+    ]
+  },
+  "imf_fit_disagreement_cases": 0,
+  "hm_wf_net": {
+    "sources": 1,
+    "sinks": 1,
+    "nodes_not_on_path": 0,
+    "is_wf_net": true
+  },
+  "hm_top_variant": {
+    "cases": 5094,
+    "trace": [
+      "A_Create Application",
+      "A_Submitted",
+      "A_Concept",
+      "A_Accepted",
+      "O_Create Offer",
+      "O_Created",
+      "O_Sent (mail and online)",
+      "A_Complete",
+      "A_Cancelled",
+      "O_Cancelled"
+    ],
+    "align_fitness": 0.8125,
+    "align_moves": [
+      "A_Create Application",
+      "A_Submitted",
+      "A_Concept",
+      "A_Accepted",
+      "O_Create Offer",
+      "O_Created",
+      "[log: O_Sent (mail and online)]",
+      "[log: A_Complete]",
+      "[log: A_Cancelled]",
+      "O_Cancelled"
+    ]
+  }
+}

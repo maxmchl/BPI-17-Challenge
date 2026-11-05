@@ -6,5 +6,4 @@ $ENV{'TEXINPUTS'}='./tum//:' . $ENV{'TEXINPUTS'};
 
 # BibTeX runs inside the output dir (build/). latexmk adds the source dir to BIBINPUTS
 # as an absolute path, which breaks when the path contains ':' (e.g. "WS 26:27").
-# A relative entry pointing one level up keeps references.bib findable.
 $ENV{'BIBINPUTS'}='..//:./:' . ($ENV{'BIBINPUTS'} // '');
