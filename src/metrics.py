@@ -14,6 +14,13 @@ Simplicity (structural, computed on the Petri net N = (P, T, F)):
 Generalization from alignments: same formula as PM4Py's token-based generalization
   (Buijs et al. 2014): 1 - mean_t( 1/sqrt(#executions of t) ), but the execution counts come
   from the model moves of the optimal alignments instead of token replay.
+
+Token replay is run twice: with PM4Py's default (`consider_activities_not_in_model_in_fitness
+= False`, events whose activity is not in the model are skipped silently) and with the
+parameter set to True (`*_tbr_nim`, own implementation because of a PM4Py bug, see
+tbr_fitness). The parameter only changes whether such a trace counts as
+fitting; token counts, and therefore log fitness, ETC precision (own replay parameters) and
+generalization (transition firings), are unaffected.
 """
 from collections import Counter
 from math import sqrt
@@ -22,6 +29,8 @@ import time
 
 import pm4py
 from pm4py.algo.conformance.alignments.petri_net import algorithm as align_algo
+from pm4py.algo.conformance.tokenreplay.variants import token_replay as tr
+from pm4py.algo.evaluation.replay_fitness.variants import token_replay as tr_fitness
 from pm4py.algo.evaluation.precision import algorithm as precision_algo
 from pm4py.algo.evaluation.replay_fitness.variants import alignment_based as align_fitness
 from pm4py.algo.evaluation.simplicity.variants import arc_degree, extended_cardoso, extended_cyclomatic
@@ -82,6 +91,37 @@ def align(log, net, im, fm, timeout_trace: float = 10.0):
         align_algo.Parameters.CORES: CORES,
     }
     return align_algo.apply_multiprocessing(log, net, im, fm, parameters=params)
+
+
+def tbr_fitness(log, net, im, fm, not_in_model: bool = False) -> tuple[dict, list]:
+    """Token-based fitness as in pm4py.fitness_token_based_replay, with the not-in-model switch.
+
+    PM4Py bug (2.7.23.11, token_replay.py l. 1388/941): with
+    CONSIDER_ACTIVITIES_NOT_IN_MODEL_IN_FITNESS=True the dict of unknown activities is shared by
+    the whole log and only checked for being non-empty, so every trace replayed after the first
+    one with an unknown activity is marked unfit (IMf 0.10: 3,143 cases with 0 missing and 0
+    remaining tokens). We therefore replay with the default and apply the intended rule
+    ourselves: a trace fits iff TBR fits it and all its activities are labels of the model.
+    Token counts and log fitness are identical in both modes.
+    """
+    elog = pm4py.convert_to_event_log(log) if hasattr(log, "columns") else log
+    params = {tr.Parameters.CONSIDER_REMAINING_IN_FITNESS: True,
+              tr.Parameters.SHOW_PROGRESS_BAR: False}
+    replayed = tr.apply(elog, net, im, fm, parameters=params)
+    if not_in_model:
+        labels = {t.label for t in net.transitions if t.label is not None}
+        replayed = [dict(r, trace_is_fit=r["trace_is_fit"] and all(e["concept:name"] in labels for e in t))
+                    for r, t in zip(replayed, elog)]
+    return tr_fitness.evaluate(replayed), replayed
+
+
+def tbr_both(log, net, im, fm) -> dict:
+    r = {}
+    (f, _), r["t_fitness_tbr"] = timed(tbr_fitness, log, net, im, fm, False)
+    r["fitness_tbr"], r["fit_traces_tbr_pct"] = f["log_fitness"], f["percentage_of_fitting_traces"]
+    (f, _), r["t_fitness_tbr_nim"] = timed(tbr_fitness, log, net, im, fm, True)
+    r["fitness_tbr_nim"], r["fit_traces_tbr_nim_pct"] = f["log_fitness"], f["percentage_of_fitting_traces"]
+    return r
 
 
 def timed(f, *a, **kw):
@@ -148,19 +188,27 @@ def structural(net, im) -> dict:
 
 
 def evaluate(log, net, im, fm, align_timeout_trace: float = 10.0,
-             cyclomatic_timeout: float = 120.0, save=lambda r: None) -> tuple[dict, list]:
+             cyclomatic_timeout: float = 120.0, save=lambda r: None,
+             fast: bool = False) -> tuple[dict, list, list]:
     """All metrics for one model; runtimes in seconds. `save(r)` is called after every step,
-    so partial results survive if a later step hangs."""
+    so partial results survive if a later step hangs.
+
+    fast=True (iterations) skips alignment-based ETC precision, which aligns every unique
+    prefix and matched token-based precision within 0.002 over the whole IMf sweep, and the
+    extended cyclomatic metric (reachability graph).
+
+    Returns (metrics, per-trace alignments, case id per alignment).
+    """
     r = structural(net, im)
     save(r)
 
-    tbr, r["t_fitness_tbr"] = timed(pm4py.fitness_token_based_replay, log, net, im, fm)
-    r["fitness_tbr"] = tbr["log_fitness"]
-    r["fit_traces_tbr_pct"] = tbr["percentage_of_fitting_traces"]
+    r.update(tbr_both(log, net, im, fm))
     save(r)
 
     # alignments are unpacked per trace, so percentages are weighted by case count
-    aligned, r["t_alignments"] = timed(align, log, net, im, fm, align_timeout_trace)
+    elog = pm4py.convert_to_event_log(log) if hasattr(log, "columns") else log
+    case_ids = [t.attributes["concept:name"] for t in elog]
+    aligned, r["t_alignments"] = timed(align, elog, net, im, fm, align_timeout_trace)
     ok = [a for a in aligned if a is not None]
     r["alignments_failed"] = len(aligned) - len(ok)
     af = align_fitness.evaluate(ok)
@@ -172,6 +220,8 @@ def evaluate(log, net, im, fm, align_timeout_trace: float = 10.0,
     r["precision_tbr"], r["t_precision_tbr"] = timed(pm4py.precision_token_based_replay, log, net, im, fm)
     r["generalization_tbr"], r["t_generalization_tbr"] = timed(pm4py.generalization_tbr, log, net, im, fm)
     save(r)
+    if fast:
+        return r, aligned, case_ids
 
     r["precision_align"], r["t_precision_align"] = timed(precision_alignments, log, net, im, fm)
     save(r)
@@ -179,4 +229,4 @@ def evaluate(log, net, im, fm, align_timeout_trace: float = 10.0,
     cyc, r["t_ext_cyclomatic"] = timed(with_timeout, extended_cyclomatic.apply, (net, im), cyclomatic_timeout)
     r["simp_ext_cyclomatic"] = float("nan") if cyc is None else cyc
     save(r)
-    return r, aligned
+    return r, aligned, case_ids

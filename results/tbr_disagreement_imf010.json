@@ -1,0 +1,9 @@
+{
+  "cases where PM4Py's switch and the intended rule disagree (bug)": 3143,
+  "combos (tbr default, tbr switch, alignments fit) -> cases": {
+    "(True, True, True)": 27875,
+    "(False, False, False)": 3343,
+    "(True, False, False)": 193
+  },
+  "top disagreeing variants": []
+}

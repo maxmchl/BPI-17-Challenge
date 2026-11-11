@@ -12,7 +12,7 @@
     "simp_arc_degree": 0.6969696969696969,
     "simp_ext_cardoso": 41,
     "is_wf_net": true,
-    "t_fitness_tbr": 3.0914320000447333,
+    "t_fitness_tbr": 4.573110917001031,
     "fitness_tbr": 0.9695338617084999,
     "fit_traces_tbr_pct": 62.26481169017223,
     "t_alignments": 35.650864875060506,
@@ -28,7 +28,10 @@
     "t_precision_align": 134.53513087506872,
     "t_ext_cyclomatic": 1.268766832887195,
     "simp_ext_cyclomatic": 85,
-    "t_discovery": 0.33584729209542274
+    "t_discovery": 0.33584729209542274,
+    "t_fitness_tbr_nim": 4.699624834000133,
+    "fitness_tbr_nim": 0.9695338617084999,
+    "fit_traces_tbr_nim_pct": 62.26481169017223
   },
   "HM": {
     "places": 29,
@@ -43,8 +46,8 @@
     "simp_arc_degree": 0.5572519083969465,
     "simp_ext_cardoso": 52,
     "is_wf_net": true,
-    "t_fitness_tbr": 2.6016366670373827,
-    "fitness_tbr": 0.8619759695523426,
+    "t_fitness_tbr": 4.66312337492127,
+    "fitness_tbr": 0.8618881997427839,
     "fit_traces_tbr_pct": 0.0,
     "t_alignments": 192.9985593339661,
     "alignments_failed": 41,
@@ -59,7 +62,10 @@
     "t_precision_align": 181.79444608394988,
     "t_ext_cyclomatic": 120.02768433303572,
     "simp_ext_cyclomatic": NaN,
-    "t_discovery": 0.6457472500624135
+    "t_discovery": 0.6457472500624135,
+    "t_fitness_tbr_nim": 4.604816833976656,
+    "fitness_tbr_nim": 0.8618881997427839,
+    "fit_traces_tbr_nim_pct": 0.0
   },
   "IM": {
     "places": 49,
@@ -74,7 +80,7 @@
     "simp_arc_degree": 0.6647398843930635,
     "simp_ext_cardoso": 69,
     "is_wf_net": true,
-    "t_fitness_tbr": 3.6094023750629276,
+    "t_fitness_tbr": 5.045847959001549,
     "fitness_tbr": 1.0,
     "fit_traces_tbr_pct": 100.0,
     "t_alignments": 1169.0554966250202,
@@ -90,6 +96,9 @@
     "t_precision_align": 4866.1998385409825,
     "t_ext_cyclomatic": 3.3553472079802305,
     "simp_ext_cyclomatic": 77728,
-    "t_discovery": 0.6330600830260664
+    "t_discovery": 0.6330600830260664,
+    "t_fitness_tbr_nim": 5.4472073330543935,
+    "fitness_tbr_nim": 1.0,
+    "fit_traces_tbr_nim_pct": 100.0
   }
 }

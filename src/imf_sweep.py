@@ -45,7 +45,7 @@ def run():
             results[key] = {**r, "t_discovery": t_disc}
             OUT_JSON.write_text(json.dumps(results, indent=2))
 
-        r, _ = evaluate(log, net, im, fm, save=save)
+        r, _, _ = evaluate(log, net, im, fm, save=save)
         save(r)
         print(f"[{key}] fit {r['fit_traces_align_pct']:.1f}%  fitness {r['fitness_align']:.3f}  "
               f"precision {r['precision_align']:.3f}  size {r['own_size']}", flush=True)

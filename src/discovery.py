@@ -44,6 +44,7 @@ ROWS = [
     ("fitness_tbr", "Fitness (token replay)"),
     ("fitness_align", "Fitness (alignments)"),
     ("fit_traces_tbr_pct", "Fitting traces \\% (token replay)"),
+    ("fit_traces_tbr_nim_pct", "Fitting traces \\% (TBR, not-in-model counted)"),
     ("fit_traces_align_pct", "Fitting traces \\% (alignments)"),
     ("precision_tbr", "Precision (ETC, token replay)"),
     ("precision_align", "Precision (ETC, alignments)"),
@@ -88,10 +89,13 @@ def main(names):
             results[name] = {**r, "t_discovery": t_disc}
             out_json.write_text(json.dumps(results, indent=2))
 
-        r, _ = evaluate(log, net, im, fm, ALIGN_TIMEOUT_TRACE, CYCLOMATIC_TIMEOUT, save)
+        r, _, _ = evaluate(log, net, im, fm, ALIGN_TIMEOUT_TRACE, CYCLOMATIC_TIMEOUT, save)
         save(r)
         print(f"[{name}] " + ", ".join(f"{k}={v:.4g}" for k, v in r.items()), flush=True)
+    write_tables(results)
 
+
+def write_tables(results):
     tab = pd.DataFrame(results)
     tab = tab[[m for m in MODELS if m in tab.columns]]
     tab.to_csv(RES / "discovery_metrics.csv")
