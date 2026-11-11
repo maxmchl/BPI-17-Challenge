@@ -41,14 +41,21 @@ def coverage(d, collapse=False):
 def fig_variant_coverage(df):
     complete = df[df[LC] == "complete"]
     ao = complete[complete[ACT].str[:2].isin(["A_", "O_"])]
+    w_start = df[(df[LC] == "start") & df[ACT].str.startswith("W_")]
+    b1 = pd.concat([ao, w_start]).sort_values([CASE, TS, "EventID"], kind="stable")
+    b1c = b1[~b1[ACT].isin(["O_Created", "O_Accepted", "O_Refused"])].copy()
+    b1c[ACT] = b1c[ACT].where(~b1c[ACT].str.startswith("O_Sent"), "O_Sent")
+    # (name, data, colour, line style): B1c is derived from B1 -> same hue, dashed
     series = [
-        ("raw log", coverage(df)),
-        ("lifecycle = complete", coverage(complete)),
-        ("A_ + O_ events, complete", coverage(ao)),
+        ("raw log", coverage(df), C[0], "-"),
+        ("lifecycle = complete", coverage(complete), C[1], "-"),
+        ("A_ + O_ events, complete (log A)", coverage(ao), C[2], "-"),
+        ("A + W_ start events (log B1)", coverage(b1), C[3], "-"),
+        ("B1 without duplicates (log B1c)", coverage(b1c), C[3], (0, (3, 2))),
     ]  # collapsing direct repeats on top changes little (65 -> 61 variants for 80 %), see extra_stats
-    fig, ax = plt.subplots(figsize=(W, 2.2))
-    for (name, (x, y)), col in zip(series, C):
-        ax.plot(x, y, color=col, label=name)
+    fig, ax = plt.subplots(figsize=(W, 2.3))
+    for name, (x, y), col, ls in series:
+        ax.plot(x, y, color=col, ls=ls, label=name)
         n80 = int(np.searchsorted(y, 80) + 1)
         ax.plot([n80], [80], "o", ms=4, color=col, mec="white", mew=1)
     ax.axhline(80, color=INK2, lw=0.8, ls=(0, (3, 2)))
@@ -57,7 +64,8 @@ def fig_variant_coverage(df):
     ax.set_xlabel("number of most frequent variants (log scale)")
     ax.set_ylabel("cases covered [%]")
     ax.set_ylim(0, 100)
-    ax.legend(frameon=False, loc="lower right")
+    ax.legend(frameon=False, loc="upper center", bbox_to_anchor=(0.45, -0.22), ncol=2, fontsize=6.5,
+              columnspacing=1.0, handlelength=2.2)
     fig.savefig(FIG / "variant_coverage.pdf")
     fig.savefig(FIG / "variant_coverage.png", dpi=200)
     plt.close(fig)

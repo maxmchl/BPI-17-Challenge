@@ -1,0 +1,22 @@
+{
+  "events_by_origin": {
+    "W_ (work item)": {
+      "events": 768823,
+      "pct": 63.9
+    },
+    "A_ (application)": {
+      "events": 239595,
+      "pct": 19.9
+    },
+    "O_ (offer)": {
+      "events": 193849,
+      "pct": 16.1
+    }
+  },
+  "work_items_started_per_case": {
+    "mean": 4.07,
+    "sd": 2.11,
+    "median": 4.0,
+    "max": 20
+  }
+}

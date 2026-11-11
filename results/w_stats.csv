@@ -1,0 +1,9 @@
+concept:name,cases,cases_with_start,cases_with_complete,starts,ends_complete_pct,ends_ate_abort_pct,ends_withdraw_pct
+W_Complete application,31509,29646,19102,29918,60.6,33.5,5.9
+W_Call after offers,31362,31362,341,31485,1.0,89.8,9.2
+W_Validate application,21870,21870,10912,39444,40.6,59.4,0.0
+W_Handle leads,20423,3643,3493,3727,17.1,0.7,82.2
+W_Call incomplete files,15003,15003,2660,23218,12.1,87.9,0.0
+W_Assess potential fraud,303,301,268,355,86.2,12.8,0.9
+W_Shortened completion ,74,74,0,76,,,
+W_Personal Loan collection,2,2,0,4,,,
