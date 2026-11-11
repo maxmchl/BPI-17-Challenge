@@ -16,3 +16,4 @@ report/*.synctex.gz
 report/*.bbl
 report/*.blg
 report/*.out
+results/*.log

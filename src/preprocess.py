@@ -21,6 +21,8 @@ Options:
 
 Run `python src/stats.py` first (writes results/cases.parquet with the per-case outcome).
 """
+import json
+
 import pandas as pd
 
 from load import load_log, ROOT, CASE, ACT, TS, LC
@@ -72,6 +74,14 @@ def build_log(version: str = "A", merge_osent: bool = False, collapse_repeats: b
         rep = (out[ACT] == out[ACT].shift()) & (out[CASE] == out[CASE].shift())
         out = out[~rep].reset_index(drop=True)
     return out
+
+
+def final_log(keep_attrs: bool = False, df: pd.DataFrame | None = None) -> tuple[pd.DataFrame, dict]:
+    """Log of the configuration chosen in iterations.py (results/final_choice.json) and that row."""
+    cfg = json.loads((ROOT / "results" / "final_choice.json").read_text())["chosen"]
+    log = build_log(cfg["log"], merge_osent=cfg["merge_osent"], collapse_repeats=cfg["collapse_repeats"],
+                    df=df, keep_attrs=keep_attrs)
+    return log, cfg
 
 
 if __name__ == "__main__":
