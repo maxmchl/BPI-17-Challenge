@@ -1,0 +1,115 @@
+{
+  "configuration": "It1",
+  "counts_by_type": {
+    "XOR": 8,
+    "self-loop": 6,
+    "loop decision": 1
+  },
+  "points": [
+    {
+      "decision_point": "D1",
+      "type": "loop decision",
+      "cases": 31411,
+      "visits": 42811,
+      "branches": 2
+    },
+    {
+      "decision_point": "D2",
+      "type": "XOR",
+      "cases": 31411,
+      "visits": 42811,
+      "branches": 2
+    },
+    {
+      "decision_point": "D3",
+      "type": "self-loop",
+      "cases": 31264,
+      "visits": 41541,
+      "branches": 2
+    },
+    {
+      "decision_point": "D4",
+      "type": "self-loop",
+      "cases": 21795,
+      "visits": 38539,
+      "branches": 2
+    },
+    {
+      "decision_point": "D5",
+      "type": "XOR",
+      "cases": 31264,
+      "visits": 38355,
+      "branches": 2
+    },
+    {
+      "decision_point": "D6",
+      "type": "XOR",
+      "cases": 31264,
+      "visits": 38355,
+      "branches": 2
+    },
+    {
+      "decision_point": "D7",
+      "type": "XOR",
+      "cases": 31411,
+      "visits": 31411,
+      "branches": 2
+    },
+    {
+      "decision_point": "D8",
+      "type": "XOR",
+      "cases": 31411,
+      "visits": 31411,
+      "branches": 3
+    },
+    {
+      "decision_point": "D9",
+      "type": "XOR",
+      "cases": 31411,
+      "visits": 31411,
+      "branches": 2
+    },
+    {
+      "decision_point": "D10",
+      "type": "XOR",
+      "cases": 27669,
+      "visits": 27669,
+      "branches": 2
+    },
+    {
+      "decision_point": "D11",
+      "type": "self-loop",
+      "cases": 21795,
+      "visits": 23475,
+      "branches": 2
+    },
+    {
+      "decision_point": "D12",
+      "type": "XOR",
+      "cases": 21795,
+      "visits": 23295,
+      "branches": 2
+    },
+    {
+      "decision_point": "D13",
+      "type": "self-loop",
+      "cases": 14950,
+      "visits": 22943,
+      "branches": 2
+    },
+    {
+      "decision_point": "D14",
+      "type": "self-loop",
+      "cases": 14724,
+      "visits": 18877,
+      "branches": 2
+    },
+    {
+      "decision_point": "D15",
+      "type": "self-loop",
+      "cases": 3720,
+      "visits": 4695,
+      "branches": 2
+    }
+  ]
+}

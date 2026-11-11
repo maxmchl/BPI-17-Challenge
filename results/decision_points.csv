@@ -1,0 +1,32 @@
+decision_point,place,type,loop_body,cases_reaching,visits,branch_transition,branch_label,branch_leads_to,branch_is_loop_back,count,probability
+D1,p_10,loop decision,A_Complete; A_Incomplete; A_Validating; O_Create Offer; O_Created; O_Returned; O_Sent,31411,42811,skip_28,tau,A_Cancelled; A_Denied; O_Accepted; end,False,31411,0.7337
+D1,p_10,loop decision,A_Complete; A_Incomplete; A_Validating; O_Create Offer; O_Created; O_Returned; O_Sent,31411,42811,skip_27,tau,O_Create Offer,True,11400,0.2663
+D2,p_12,XOR,,31411,42811,skip_5,tau,A_Cancelled; A_Denied; O_Accepted; O_Create Offer; end,False,4456,0.1041
+D2,p_12,XOR,,31411,42811,init_loop_6,tau,O_Sent,False,38355,0.8959
+D3,p_15,self-loop,O_Sent,31264,41541,skip_8,tau,O_Sent,True,3186,0.0767
+D3,p_15,self-loop,O_Sent,31264,41541,skip_9,tau,A_Cancelled; A_Complete; A_Denied; A_Incomplete; A_Validating; O_Accepted; O_Create Offer; O_Returned; end,False,38355,0.9233
+D4,p_21,self-loop,A_Validating,21795,38539,tauJoin_13,tau,A_Cancelled; A_Denied; O_Accepted; O_Create Offer; end,False,23295,0.6045
+D4,p_21,self-loop,A_Validating,21795,38539,skip_16,tau,A_Validating,True,15244,0.3955
+D5,p_17,XOR,,31264,38355,skip_11,tau,A_Cancelled; A_Denied; O_Accepted; O_Create Offer; end,False,15060,0.3926
+D5,p_17,XOR,,31264,38355,tauSplit_12,tau,A_Cancelled; A_Denied; A_Incomplete; A_Validating; O_Accepted; O_Create Offer; O_Returned; end,False,23295,0.6074
+D6,p_13,XOR,,31264,38355,skip_10,tau,A_Cancelled; A_Denied; A_Incomplete; A_Validating; O_Accepted; O_Create Offer; O_Returned; end,False,7093,0.1849
+D6,p_13,XOR,,31264,38355,5385b97e-f9ae-4f78-b427-6232906e04d6,A_Complete,A_Complete,False,31262,0.8151
+D7,p_34,XOR,,31411,31411,c6eae8da-46a6-45df-8069-ee13eafe42a1,A_Denied,A_Denied,False,3720,0.1184
+D7,p_34,XOR,,31411,31411,skip_35,tau,end,False,27691,0.8816
+D8,p_8,XOR,,31411,31411,71f591fa-f384-4ee8-af34-8fc3c8107b58,O_Accepted,O_Accepted,False,17228,0.5485
+D8,p_8,XOR,,31411,31411,skip_29,tau,A_Denied; end,False,3742,0.1191
+D8,p_8,XOR,,31411,31411,bf090351-9b75-4957-ae7f-d01af9b9bad9,A_Cancelled,A_Cancelled,False,10441,0.3324
+D9,p_4,XOR,,31411,31411,skip_2,tau,A_Concept,False,11072,0.3525
+D9,p_4,XOR,,31411,31411,7bd3f4d7-6bbb-40c7-8ba8-2823f9f4d9cf,A_Submitted,A_Submitted,False,20339,0.6475
+D10,p_35,XOR,,27669,27669,init_loop_31,tau,O_Cancelled,False,14724,0.5321
+D10,p_35,XOR,,27669,27669,skip_30,tau,A_Denied; end,False,12945,0.4679
+D11,p_26,self-loop,O_Returned,21795,23475,skip_20,tau,O_Returned,True,180,0.0077
+D11,p_26,self-loop,O_Returned,21795,23475,tauJoin_13,tau,A_Cancelled; A_Denied; O_Accepted; O_Create Offer; end,False,23295,0.9923
+D12,p_28,XOR,,21795,23295,init_loop_23,tau,A_Incomplete,False,15853,0.6805
+D12,p_28,XOR,,21795,23295,skip_22,tau,A_Cancelled; A_Denied; O_Accepted; O_Create Offer; end,False,7442,0.3195
+D13,p_31,self-loop,A_Incomplete,14950,22943,skip_26,tau,A_Cancelled; A_Denied; O_Accepted; O_Create Offer; end,False,15853,0.691
+D13,p_31,self-loop,A_Incomplete,14950,22943,skip_25,tau,A_Incomplete,True,7090,0.309
+D14,p_38,self-loop,O_Cancelled,14724,18877,skip_34,tau,A_Denied; end,False,14724,0.78
+D14,p_38,self-loop,O_Cancelled,14724,18877,skip_33,tau,O_Cancelled,True,4153,0.22
+D15,p_42,self-loop,O_Refused,3720,4695,skip_39,tau,end,False,3720,0.7923
+D15,p_42,self-loop,O_Refused,3720,4695,skip_38,tau,O_Refused,True,975,0.2077
