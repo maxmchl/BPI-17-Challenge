@@ -22,6 +22,7 @@ Log versions (iteration log, Section 2.3):
         O_Accepted  same count as A_Pending in every case
         O_Refused   one per open offer when the application is denied (count set by the
                     number of offers; 32 denied cases have none)
+  C   all activities with lifecycle complete (the professor's choice; comparison only).
 Options:
   merge_osent       map "O_Sent (mail and online)" and "O_Sent (online only)" to "O_Sent".
   collapse_repeats  keep only the first of directly repeated identical activities in a case.
@@ -78,6 +79,8 @@ def build_log(version: str = "A", merge_osent: bool = False, collapse_repeats: b
     keep = (df[LC] == "complete") & df[ACT].str[:2].isin(["A_", "O_"])
     if version in ("B1", "B1c"):
         keep |= (df[LC] == "start") & df[ACT].str.startswith("W_")
+    elif version == "C":
+        keep = df[LC] == "complete"
     elif version != "A":
         raise ValueError(f"unknown log version {version!r}")
     if version == "B1c":
