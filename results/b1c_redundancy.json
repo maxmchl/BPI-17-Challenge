@@ -1,0 +1,28 @@
+{
+  "O_Create Offer directly followed by O_Created (share)": 1.0,
+  "O_Created vs O_Create Offer": {
+    "events": [
+      42815,
+      42815
+    ],
+    "cases with different counts": 0,
+    "cases with one but not the other": 0
+  },
+  "O_Accepted vs A_Pending": {
+    "events": [
+      17228,
+      17228
+    ],
+    "cases with different counts": 0,
+    "cases with one but not the other": 0
+  },
+  "O_Refused vs A_Denied": {
+    "events": [
+      4695,
+      3753
+    ],
+    "cases with different counts": 808,
+    "cases with one but not the other": 32
+  },
+  "O_Refused in denied cases: equals number of offers (share)": 0.9480277185501066
+}
