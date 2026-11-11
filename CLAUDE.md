@@ -28,11 +28,13 @@ Local, not versioned: `data/BPI_Challenge_2017.xes.gz` (event log) and `docs/` (
 
 ## Tasks (assignment PDF, Oct 16 2026 + lecture slides)
 
+Report structure (report/main.tex): 1 Introduction; 2 Approach and Results with 2.1 Technical Setup and Preliminaries, 2.2 Basic Analysis, 2.3 Process Model Creation and Validation (incl. decision mining), 2.4 Advanced Analysis.
+
 0. **Abstract:** task, log, findings, main results in 4-5 sentences.
 1. **Intro:** domain, origin and purpose of the log, existing BPIC'17 reports (state of the art + limitations). Source: https://ais.win.tue.nl/bpi/2017/challenge.html
-2. **3.1 Technical setup:** libraries, visualization, modeling tools (footnotes).
-3. **3.2 Simple statistics** - DONE (`src/stats.py`, `results/basic_stats.tex`). Required table plus at least 2 extra statistics; also typical vs long vs short cases.
-4. **3.3 Process model:**
+2. **2.1 Technical setup:** libraries, visualization, modeling tools (footnotes).
+3. **2.2 Basic analysis** - DONE (`src/stats.py`, `results/basic_stats.tex`; W_ statistics `src/w_stats.py`, `results/w_stats.tex`). Required table plus at least 2 extra statistics; also typical vs long vs short cases.
+4. **2.3 Process model:**
    - At least 2 discovery algorithms, models in the appendix.
    - All PM4Py quality metrics, plus at least 2 self-implemented simplicity metrics.
    - **Compare token-based replay vs alignments** (fitness and precision, including runtimes). Find a concrete trace where token replay is misled (silent transitions / a deviation causing follow-up missing/remaining tokens) while the alignment explains it with one cheap move.
@@ -45,14 +47,14 @@ Local, not versioned: `data/BPI_Challenge_2017.xes.gz` (event log) and `docs/` (
    - **Order matters:** do the Signavio remodel BEFORE decision mining. If the remodel changes the structure, the XORs (decision points) change too.
    - Alignments are the compute bottleneck: develop on a sample or the top variants, run the full log only for final numbers; use timeouts/multiprocessing.
    - PM4Py may need local patches (slide 37); document any patch in the repo.
-5. **Decision mining (mandatory for Master's):** alignment-based (de Leoni & van der Aalst 2013) on the final Petri net, rules visualized on the BPMN (text annotations at the gateways). Per the professor: classify decision points (XOR / self-loop / loop decision), find 2-3 with good rules, give branching probabilities for the rest and explain why no rule works. Candidates: channel online vs bank (ApplicationType = Limit raise -> bank); outcome after validation (Pending / Denied / Incomplete); return vs cancel after A_Complete is driven by the 30-day timer, so expect no attribute rule.
+5. **Decision mining (mandatory for Master's, in 2.3):** alignment-based (de Leoni & van der Aalst 2013) on the final Petri net, rules visualized on the BPMN (text annotations at the gateways). Per the professor: classify decision points (XOR / self-loop / loop decision), find 2-3 with good rules, give branching probabilities for the rest and explain why no rule works. Candidates: channel online vs bank (ApplicationType = Limit raise -> bank); outcome after validation (Pending / Denied / Incomplete); return vs cancel after A_Complete is driven by the 30-day timer, so expect no attribute rule.
    - Motivation (professor): XORs introduce uncertainty; a simulation needs a branching rule at each one.
    - PM4Py's built-in decision mining uses token replay, so implement the alignment-based extraction ourselves: align each trace, find the branch taken after each decision place (next visible sync/model move), label = branch.
    - Features: case attributes (LoanGoal, ApplicationType, RequestedAmount) + event/offer attributes known before the decision (CreditScore, OfferedAmount, MonthlyCost, NumberOfTerms, ...); optionally long-tail features from slide 48 (last k resources, elapsed/waiting times, counts). Fixed seed, held-out split, shallow trees.
    - Leakage: CreditScore, Selected and Accepted are recorded at O_Create Offer but reflect later outcomes (van der Ham 2017); use only features known before the decision.
    - **Slide 52 (mandatory):** compare decision trees vs neural networks + XAI (Park et al. 2022), only on the 2-3 good decision points. Plan: per decision point, a shallow DT (rules), an MLP + SHAP, and a surrogate DT on the MLP predictions. Report accuracy, surrogate fidelity, and agreement between SHAP features and tree splits; argue explainability vs accuracy.
 6. **Tooling rules:** list every commercial tool used and include screenshots of results (also for Signavio).
-7. **3.4 Advanced: Option 1** (SAP Signavio Process Mining Suite, designated account from the professor in the week of Nov 9): repeat 3.3 there, conformance checking and decision mining if possible, usability/visualization comparison with PM4Py, when to build yourself vs use a commercial suite, assessment of the simulation feature. Screenshots required. Drift (June 2016 jump) stays relevant for the temporal generalization check.
+7. **2.4 Advanced: Option 1** (SAP Signavio Process Mining Suite, designated account from the professor in the week of Nov 9): repeat 2.3 there, conformance checking and decision mining if possible, usability/visualization comparison with PM4Py, when to build yourself vs use a commercial suite, assessment of the simulation feature. Screenshots required. Drift (June 2016 jump) stays relevant for the temporal generalization check.
 
 ## Findings so far (from `results/extra_stats.json`)
 
@@ -71,11 +73,26 @@ Local, not versioned: `data/BPI_Challenge_2017.xes.gz` (event log) and `docs/` (
 - IMf sweep: 0.0 -> 100 % / P 0.462; 0.05 -> 93.2 % / 0.560; **0.10 -> 88.7 % / 0.592 (base model)**; 0.15 -> 62.3 % / 0.659; 0.20 -> 62.3 % / 0.625 (dominated by 0.15); 0.30 -> 40.0 % / 0.696.
 - The cliff 0.10 -> 0.15 is the offer-block loop: multi-offer cases fitting 5,457/8,511 at 0.10, 0/8,511 at 0.15.
 - Generalization gap TBR vs alignments (from 0.15 on): two silent self-loops (skip_5 on O_Created, skip_11 on O_Sent mail+online) are never fired by TBR; 0 alignment-fitting cases use them.
-- TBR pitfall: PM4Py's default `CONSIDER_ACTIVITIES_NOT_IN_MODEL_IN_FITNESS=False` silently skips events whose activity is not in the model. No IMf model contains "O_Sent (online only)", so at 0.10 TBR marks 193 cases as fitting that alignments do not (variant #66, 36 cases). Rerun TBR with the parameter set to True and report both.
+- TBR pitfall: PM4Py's default `CONSIDER_ACTIVITIES_NOT_IN_MODEL_IN_FITNESS=False` silently skips events whose activity is not in the model. No IMf model contains "O_Sent (online only)", so at 0.10 TBR marks 193 cases as fitting that alignments do not (variant #66, 36 cases).
+- **PM4Py bug (patch footnote, slide 37):** with the parameter set to True, PM4Py 2.7.23.11 keeps the unknown activities in one dict for the whole log (token_replay.py l. 1388) and only checks that it is non-empty (l. 941), so every trace replayed after the first one with an unknown activity is unfit (IMf 0.10: 3,143 fitting cases wrongly unfit). `metrics.tbr_fitness` applies the intended rule instead (fit iff TBR fits and all activities are model labels); with it IMf 0.10 gives 88.74 % = alignments. Log fitness, precision and generalization do not depend on the switch. `src/tbr_rerun.py`, `results/tbr_disagreement_imf010.json`.
 - Knock-on example (IMf 0.2, variant #62, 38 cases): one O_Sent substitution -> alignment fitness 0.895 (one log + one model move) vs TBR 0.789 (3 missing, 4 remaining tokens).
 - W_ lifecycle: most work items never reach `complete`: W_Call after offers 341 of 31,264 cases, W_Handle leads 3,473/20,339, W_Call incomplete files 2,659/14,958, W_Validate application 10,890/21,825, W_Complete application 19,059/31,411. They end in ate_abort or withdraw instead.
 - Log B timing check (web chat, Nov 10, IMf 0.10, 2 cores): A (A_+O_): 2,588 variants, net 30P/43T, 88.7 % fitting (align), alignments 73 s. **B1 (A_+O_ + W_ `start`)**: 3,997 variants, net 53P/76T (51 silent), 82.0 % fitting, alignments 742 s. B2 (A_+O_ + W_ terminal event): 3,130 variants, net 29P/50T, 73.5 % fitting, alignments 132 s. B1 matches "work actually started by a bank employee" and meets the target; B2 includes automatic withdraws (e.g. 16,740 W_Handle leads) and falls below 75 %.
 - Runtime: alignment-based ETC precision aligns every unique prefix, not every variant (A 13,776, B1 26,510, B2 23,880 prefixes), so it is the most expensive metric (IM: 4,866 s). It honours the `multiprocessing`/`cores` keys. Its values match TBR precision within 0.002 in the whole sweep, so use TBR precision (with the not-in-model parameter) during iterations and alignment precision only for the final model and the comparison table.
+
+## Decisions and results (Nov 11, web chat + local runs)
+
+- **Final model: It6_c75** = IM on the most frequent variants covering 75 % of cases (92 variants) of log **B1c**, evaluated on all 31,411 cases: 89.4 % fitting cases (alignments), fitness 0.993, precision 0.700 (TBR) / 0.701 (alignments), generalization 0.991, size 163, CNC 1.233, silent share 0.55, ext. cyclomatic 59. `results/final_metrics.json`, `results/models/final.{pnml,bpmn}`.
+- **Two-stage choice** (`src/final_choice.py`, `results/final_choice.json`): (1) log version by purpose: simulation base model + bank-vs-customer question need the W_ work items at lifecycle start (one per work item started by an employee; every W_ start event has share User_1 = 0). (2) Selection rule only within that version, because ETC precision is not comparable across logs with different activity sets: max precision with >= 80 % fitting (alignments), ties < 0.005 -> lower CNC, lower silent share, more fitting cases.
+- **Log B1c** = B1 with merged O_Sent and without O_Created (always directly after O_Create Offer), O_Accepted (= A_Pending per case) and O_Refused (one per open offer on denial; 32 denied cases have none). `results/b1c_redundancy.json`.
+- **It1 stays as the A_/O_ backbone:** merging the O_Sent labels alone raised fitting from 88.7 % to 93.0 % with an identical net (precision 0.589). Tie-break bug fixed on the way (identical nets were decided by list order).
+- **Variant filter beats IMf noise:** discover with IM on the top variants, evaluate on the full log. Best per log version (not comparable across versions): A It4_c70 86.4 % / 0.706; B1 It5_c75 89.4 % / 0.710; B1c It6_c75 89.4 % / 0.700; B1c without rare W_ (It7) 89.4 % / 0.631. IMf rows on B1: 0.10 -> 85.9 % / 0.432. Log C (all activities at lifecycle complete, professor's choice): 5,196 variants, 60 % coverage 82.1 % / 0.594, 70 % 91.3 % / 0.455 -> reason for W_ start. `figures/coverage_tradeoff.pdf`.
+- **Precision on the discovery log is always lower than on the full log** (B1c 75 %: 0.511 vs 0.700): ETC penalizes allowed continuations the log never shows. Never confuse discovery filtering with evaluation filtering.
+- **Temporal split (final config):** the halves discover different trees. H1 model: 92.6 % in sample / 94.3 % on H2, precision ~0.50; H2 model: 90.3 % in sample / 87.6 % on H1, precision ~0.61. Fitting by start month 84.5 % (May) to 92.5 % (Sep), `figures/fitting_by_month.pdf`. (With It1 the trees were identical, 92.1-94.1 % per month.)
+- **Conformance on the final model:** fitting by number of offers 1 -> 95.8 %, 2 -> 76.9 %, 3 -> 61.2 %, 4+ -> 50.4 %; TBR default vs not-in-model rule differ on 173 cases (rare W_ not in the model); TBR fires every transition. Knock-on example for the report stays variant #62 on IMf 0.2 (alignment 0.895 vs TBR 0.789).
+- **Decision points** (`results/decision_points.csv`): 14 (10 XOR, 2 loop decisions, 2 self-loops); kinds: 6 business decisions (multiple offers 26.5 % repeat, incomplete loop 39.4 %, offer returned 61.3 %, outcome Pending 54.9 / Cancelled 33.2 / Denied 11.9 %, channel A_Submitted 64.8 %, W_Handle leads 17.8 %), 4 optional-activity skips, 3 bookkeeping (O_Cancelled per open offer, cancellation events fixed by the outcome), 1 repetition (O_Sent).
+- **Swimlanes** (`results/activity_roles.csv`): Customer (A_Create Application, A_Submitted, O_Returned), Bank employees (all W_ + employee-recorded A_/O_ states, share User_1 = 0), System (A_Concept 54 %, A_Cancelled 76 %, O_Cancelled 48 % User_1; 30-day timer).
+- **W_ statistics** (`results/w_stats.*`): W_ = 63.9 % of all events; 4.07 +- 2.11 work items started per case; e.g. W_Call after offers ends in ate_abort 89.8 %, W_Handle leads in withdraw 82.2 %.
 
 ## Page budget (5 pages)
 
@@ -86,8 +103,8 @@ Abstract + intro ~0.6, setup ~0.3, statistics ~0.6, process model ~2, decision m
 | Dates | Work |
 |---|---|
 | Nov 4-5 | DONE: repo, statistics, literature, discovery (IM, IMf, HM), IMf sweep |
-| Nov 10-11 | Log B (W_ work items), data iterations + iteration log, TBR rerun with parameter, temporal split |
-| Nov 11-12 | Fix the final model, Signavio remodel with bank/customer swimlanes |
+| Nov 10-11 | DONE: log B1/B1c, iteration log, TBR rerun (PM4Py bug), temporal split, final model It6_c75, decision point inventory |
+| Nov 11-12 | Signavio remodel with three swimlanes (Customer / Bank employees / System), re-import + re-evaluate |
 | Nov 12-13 | Decision mining: classify decisions, 2-3 with rules (DT + MLP/SHAP), probabilities for the rest |
 | from Nov ~11 | Option 1 in Signavio, in parallel, once the account arrives |
 | Nov 14-17 | Writing, trade-off section, declaration, README |
@@ -99,5 +116,6 @@ Abstract + intro ~0.6, setup ~0.3, statistics ~0.6, process model ~2, decision m
 - Report: LaTeX in `report/` (TUM template, `latexmk` via `report/latexmkrc`), built by LaTeX Workshop into `report/build/`; it reads `../figures/` and `../results/` directly.
 - Python env: `.venv` is a symlink to `~/.venvs/bpic17` (venv refuses paths containing `:`).
 - `python src/load.py` caches the log as `data/bpic17.parquet`; other scripts call `load_log()`.
+- Reproduce order: load -> stats -> figures_stats -> w_stats -> preprocess (redundancy check) -> discovery -> imf_sweep -> tbr_rerun -> conformance_examples -> iterations -> final_choice -> temporal -> final_model -> conformance_examples final -> decision_points. Long runs write their JSON incrementally and skip finished rows.
 - Figures: one-column width 3.4 in, serif font, validated categorical palette `#2a78d6 #eb6834 #1baf7a #eda100` (fixed order).
 - Max prefers complete, runnable scripts and concise prose; explain concepts with concrete numbers first.
