@@ -1,4 +1,4 @@
-"""Section 3.3.2 - token replay with activities not in the model counted as deviations.
+"""Section 2.3 - token replay with activities not in the model counted as deviations.
 
 PM4Py's token replay skips events whose activity is not in the model by default
 (`consider_activities_not_in_model_in_fitness = False`). No IMf model from noise 0.10 on contains

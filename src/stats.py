@@ -1,4 +1,4 @@
-"""Section 3.2 - simple event log statistics for BPIC-17.
+"""Section 2.2 - simple event log statistics for BPIC-17.
 
 Writes results/basic_stats.csv, results/basic_stats.tex and results/extra_stats.json.
 Run:  python src/stats.py

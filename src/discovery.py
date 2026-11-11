@@ -1,4 +1,4 @@
-"""Section 3.3.1/3.3.2 - process discovery and quality metrics on the A_+O_ log.
+"""Section 2.3 - process discovery and quality metrics on the A_+O_ log.
 
 Algorithms (PM4Py, parameters documented here and in the report):
   IM   Inductive Miner,            noise_threshold = 0.0

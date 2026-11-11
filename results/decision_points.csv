@@ -1,32 +1,30 @@
-decision_point,place,type,loop_body,cases_reaching,visits,branch_transition,branch_label,branch_leads_to,branch_is_loop_back,count,probability
-D1,p_10,loop decision,A_Complete; A_Incomplete; A_Validating; O_Create Offer; O_Created; O_Returned; O_Sent,31411,42811,skip_28,tau,A_Cancelled; A_Denied; O_Accepted; end,False,31411,0.7337
-D1,p_10,loop decision,A_Complete; A_Incomplete; A_Validating; O_Create Offer; O_Created; O_Returned; O_Sent,31411,42811,skip_27,tau,O_Create Offer,True,11400,0.2663
-D2,p_12,XOR,,31411,42811,skip_5,tau,A_Cancelled; A_Denied; O_Accepted; O_Create Offer; end,False,4456,0.1041
-D2,p_12,XOR,,31411,42811,init_loop_6,tau,O_Sent,False,38355,0.8959
-D3,p_15,self-loop,O_Sent,31264,41541,skip_8,tau,O_Sent,True,3186,0.0767
-D3,p_15,self-loop,O_Sent,31264,41541,skip_9,tau,A_Cancelled; A_Complete; A_Denied; A_Incomplete; A_Validating; O_Accepted; O_Create Offer; O_Returned; end,False,38355,0.9233
-D4,p_21,self-loop,A_Validating,21795,38539,tauJoin_13,tau,A_Cancelled; A_Denied; O_Accepted; O_Create Offer; end,False,23295,0.6045
-D4,p_21,self-loop,A_Validating,21795,38539,skip_16,tau,A_Validating,True,15244,0.3955
-D5,p_17,XOR,,31264,38355,skip_11,tau,A_Cancelled; A_Denied; O_Accepted; O_Create Offer; end,False,15060,0.3926
-D5,p_17,XOR,,31264,38355,tauSplit_12,tau,A_Cancelled; A_Denied; A_Incomplete; A_Validating; O_Accepted; O_Create Offer; O_Returned; end,False,23295,0.6074
-D6,p_13,XOR,,31264,38355,skip_10,tau,A_Cancelled; A_Denied; A_Incomplete; A_Validating; O_Accepted; O_Create Offer; O_Returned; end,False,7093,0.1849
-D6,p_13,XOR,,31264,38355,5385b97e-f9ae-4f78-b427-6232906e04d6,A_Complete,A_Complete,False,31262,0.8151
-D7,p_34,XOR,,31411,31411,c6eae8da-46a6-45df-8069-ee13eafe42a1,A_Denied,A_Denied,False,3720,0.1184
-D7,p_34,XOR,,31411,31411,skip_35,tau,end,False,27691,0.8816
-D8,p_8,XOR,,31411,31411,71f591fa-f384-4ee8-af34-8fc3c8107b58,O_Accepted,O_Accepted,False,17228,0.5485
-D8,p_8,XOR,,31411,31411,skip_29,tau,A_Denied; end,False,3742,0.1191
-D8,p_8,XOR,,31411,31411,bf090351-9b75-4957-ae7f-d01af9b9bad9,A_Cancelled,A_Cancelled,False,10441,0.3324
-D9,p_4,XOR,,31411,31411,skip_2,tau,A_Concept,False,11072,0.3525
-D9,p_4,XOR,,31411,31411,7bd3f4d7-6bbb-40c7-8ba8-2823f9f4d9cf,A_Submitted,A_Submitted,False,20339,0.6475
-D10,p_35,XOR,,27669,27669,init_loop_31,tau,O_Cancelled,False,14724,0.5321
-D10,p_35,XOR,,27669,27669,skip_30,tau,A_Denied; end,False,12945,0.4679
-D11,p_26,self-loop,O_Returned,21795,23475,skip_20,tau,O_Returned,True,180,0.0077
-D11,p_26,self-loop,O_Returned,21795,23475,tauJoin_13,tau,A_Cancelled; A_Denied; O_Accepted; O_Create Offer; end,False,23295,0.9923
-D12,p_28,XOR,,21795,23295,init_loop_23,tau,A_Incomplete,False,15853,0.6805
-D12,p_28,XOR,,21795,23295,skip_22,tau,A_Cancelled; A_Denied; O_Accepted; O_Create Offer; end,False,7442,0.3195
-D13,p_31,self-loop,A_Incomplete,14950,22943,skip_26,tau,A_Cancelled; A_Denied; O_Accepted; O_Create Offer; end,False,15853,0.691
-D13,p_31,self-loop,A_Incomplete,14950,22943,skip_25,tau,A_Incomplete,True,7090,0.309
-D14,p_38,self-loop,O_Cancelled,14724,18877,skip_34,tau,A_Denied; end,False,14724,0.78
-D14,p_38,self-loop,O_Cancelled,14724,18877,skip_33,tau,O_Cancelled,True,4153,0.22
-D15,p_42,self-loop,O_Refused,3720,4695,skip_39,tau,end,False,3720,0.7923
-D15,p_42,self-loop,O_Refused,3720,4695,skip_38,tau,O_Refused,True,975,0.2077
+decision_point,place,type,kind,rule_candidate,loop_body,cases_reaching,visits,branch_transition,branch_label,branch_leads_to,branch_is_loop_back,count,probability
+D1,p_16,XOR,optional-activity skip,,,31411,42724,skip_9,tau,A_Cancelled; A_Denied; A_Pending; O_Cancelled; O_Create Offer; end,False,4463,0.1045
+D1,p_16,XOR,optional-activity skip,,,31411,42724,init_loop_10,tau,O_Sent,False,38261,0.8955
+D2,p_15,loop decision,business decision,multiple offers,A_Complete; A_Incomplete; A_Validating; O_Create Offer; O_Returned; O_Sent; W_Call after offers; W_Call incomplete files; W_Validate application,31411,42724,skip_24,tau,A_Cancelled; A_Denied; A_Pending; O_Cancelled; end,False,31411,0.7352
+D2,p_15,loop decision,business decision,multiple offers,A_Complete; A_Incomplete; A_Validating; O_Create Offer; O_Returned; O_Sent; W_Call after offers; W_Call incomplete files; W_Validate application,31411,42724,skip_23,tau,O_Create Offer,True,11313,0.2648
+D3,p_19,self-loop,repetition,,O_Sent,31264,41444,skip_13,tau,A_Cancelled; A_Denied; A_Pending; O_Cancelled; O_Create Offer; O_Returned; W_Call after offers; W_Validate application; end,False,38261,0.9232
+D3,p_19,self-loop,repetition,,O_Sent,31264,41444,skip_12,tau,O_Sent,True,3183,0.0768
+D4,p_30,XOR,optional-activity skip,,,21825,38731,ade03927-cf2b-44c6-91d7-8efe24760515,W_Call incomplete files,W_Call incomplete files,False,22921,0.5918
+D4,p_30,XOR,optional-activity skip,,,21825,38731,skip_20,tau,A_Cancelled; A_Denied; A_Pending; O_Cancelled; O_Create Offer; W_Validate application; end,False,15810,0.4082
+D5,p_28,loop decision,business decision,incomplete loop,A_Incomplete; A_Validating; W_Call incomplete files; W_Validate application,21825,38731,tauJoin_17,tau,A_Cancelled; A_Denied; A_Pending; O_Cancelled; O_Create Offer; end,False,23458,0.6057
+D5,p_28,loop decision,business decision,incomplete loop,A_Incomplete; A_Validating; W_Call incomplete files; W_Validate application,21825,38731,skip_21,tau,W_Validate application,True,15273,0.3943
+D6,p_17,XOR,optional-activity skip,,,31264,38261,skip_14,tau,A_Cancelled; A_Denied; A_Pending; O_Cancelled; O_Create Offer; O_Returned; W_Validate application; end,False,6981,0.1825
+D6,p_17,XOR,optional-activity skip,,,31264,38261,533963da-7bb1-4371-a1ac-b12c583913a5,W_Call after offers,W_Call after offers,False,31280,0.8175
+D7,p_21,XOR,business decision,"offer returned vs not (customer, 30-day timer)",,31264,38261,tauSplit_16,tau,O_Returned; W_Validate application,False,23458,0.6131
+D7,p_21,XOR,business decision,"offer returned vs not (customer, 30-day timer)",,31264,38261,skip_15,tau,A_Cancelled; A_Denied; A_Pending; O_Cancelled; O_Create Offer; end,False,14803,0.3869
+D8,p_8,XOR,optional-activity skip,,,31411,31411,d5d36884-0b3a-438f-b352-b1e7a061dcbe,W_Complete application,W_Complete application,False,29484,0.9387
+D8,p_8,XOR,optional-activity skip,,,31411,31411,skip_6,tau,A_Accepted,False,1927,0.0613
+D9,p_13,XOR,business decision,outcome,,31411,31411,2ebe1d30-30fc-4997-8949-9a5216ce36b9,A_Pending,A_Pending,False,17228,0.5485
+D9,p_13,XOR,business decision,outcome,,31411,31411,skip_25,tau,A_Cancelled; O_Cancelled; end,False,10441,0.3324
+D9,p_13,XOR,business decision,outcome,,31411,31411,1915d735-701c-461b-8a68-9f6d29b42796,A_Denied,A_Denied,False,3742,0.1191
+D10,p_4,XOR,business decision,channel (online vs bank),,31411,31411,skip_2,tau,A_Accepted; A_Concept; W_Complete application,False,11072,0.3525
+D10,p_4,XOR,business decision,channel (online vs bank),,31411,31411,849796e8-0277-4d37-9315-b2699d65dff0,A_Submitted,A_Submitted,False,20339,0.6475
+D11,p_34,XOR,bookkeeping,,,27669,27669,tauSplit_27,tau,A_Cancelled; O_Cancelled; end,False,14877,0.5377
+D11,p_34,XOR,bookkeeping,,,27669,27669,skip_26,tau,end,False,12792,0.4623
+D12,p_6,XOR,business decision,W_Handle leads (manual lead handling),,20339,20339,skip_3,tau,A_Accepted; A_Concept; W_Complete application,False,16718,0.822
+D12,p_6,XOR,business decision,W_Handle leads (manual lead handling),,20339,20339,e63f14a8-bc18-431d-b087-1243b04c67b1,W_Handle leads,W_Handle leads,False,3621,0.178
+D13,p_40,self-loop,bookkeeping,,O_Cancelled,14877,19204,tauJoin_28,tau,end,False,14877,0.7747
+D13,p_40,self-loop,bookkeeping,,O_Cancelled,14877,19204,skip_32,tau,O_Cancelled,True,4327,0.2253
+D14,p_35,XOR,bookkeeping,,,14877,14877,skip_29,tau,end,False,4446,0.2989
+D14,p_35,XOR,bookkeeping,,,14877,14877,512b2c29-1a06-4473-b36a-a912adba4eec,A_Cancelled,A_Cancelled,False,10431,0.7011

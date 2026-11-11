@@ -1,4 +1,4 @@
-"""Figures for Section 3.2 (simple event log analysis).
+"""Figures for Section 2.2 (simple event log analysis).
 
 Writes figures/variant_coverage.pdf, figures/duration_by_outcome.pdf, figures/weekly_arrivals.pdf
 Run after stats.py:  python src/figures_stats.py

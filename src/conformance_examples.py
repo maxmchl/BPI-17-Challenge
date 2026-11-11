@@ -1,4 +1,4 @@
-"""Section 3.3.2 - diagnostics behind the token replay (TBR) vs alignments comparison.
+"""Section 2.3 - diagnostics behind the token replay (TBR) vs alignments comparison.
 
 1. Generalization gap (IMf): transitions that TBR never fires, with their alignment counts.
 2. Trace example (IMf): variant with the largest gap between per-trace TBR fitness and

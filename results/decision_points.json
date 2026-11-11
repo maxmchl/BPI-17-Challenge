@@ -1,114 +1,141 @@
 {
-  "configuration": "It1",
+  "configuration": "It6_c75",
   "counts_by_type": {
-    "XOR": 8,
-    "self-loop": 6,
-    "loop decision": 1
+    "XOR": 10,
+    "loop decision": 2,
+    "self-loop": 2
+  },
+  "counts_by_kind": {
+    "business decision": 6,
+    "optional-activity skip": 4,
+    "bookkeeping": 3,
+    "repetition": 1
   },
   "points": [
     {
       "decision_point": "D1",
-      "type": "loop decision",
+      "type": "XOR",
+      "kind": "optional-activity skip",
+      "rule_candidate": "",
       "cases": 31411,
-      "visits": 42811,
+      "visits": 42724,
       "branches": 2
     },
     {
       "decision_point": "D2",
-      "type": "XOR",
+      "type": "loop decision",
+      "kind": "business decision",
+      "rule_candidate": "multiple offers",
       "cases": 31411,
-      "visits": 42811,
+      "visits": 42724,
       "branches": 2
     },
     {
       "decision_point": "D3",
       "type": "self-loop",
+      "kind": "repetition",
+      "rule_candidate": "",
       "cases": 31264,
-      "visits": 41541,
+      "visits": 41444,
       "branches": 2
     },
     {
       "decision_point": "D4",
-      "type": "self-loop",
-      "cases": 21795,
-      "visits": 38539,
+      "type": "XOR",
+      "kind": "optional-activity skip",
+      "rule_candidate": "",
+      "cases": 21825,
+      "visits": 38731,
       "branches": 2
     },
     {
       "decision_point": "D5",
-      "type": "XOR",
-      "cases": 31264,
-      "visits": 38355,
+      "type": "loop decision",
+      "kind": "business decision",
+      "rule_candidate": "incomplete loop",
+      "cases": 21825,
+      "visits": 38731,
       "branches": 2
     },
     {
       "decision_point": "D6",
       "type": "XOR",
+      "kind": "optional-activity skip",
+      "rule_candidate": "",
       "cases": 31264,
-      "visits": 38355,
+      "visits": 38261,
       "branches": 2
     },
     {
       "decision_point": "D7",
       "type": "XOR",
-      "cases": 31411,
-      "visits": 31411,
+      "kind": "business decision",
+      "rule_candidate": "offer returned vs not (customer, 30-day timer)",
+      "cases": 31264,
+      "visits": 38261,
       "branches": 2
     },
     {
       "decision_point": "D8",
       "type": "XOR",
+      "kind": "optional-activity skip",
+      "rule_candidate": "",
+      "cases": 31411,
+      "visits": 31411,
+      "branches": 2
+    },
+    {
+      "decision_point": "D9",
+      "type": "XOR",
+      "kind": "business decision",
+      "rule_candidate": "outcome",
       "cases": 31411,
       "visits": 31411,
       "branches": 3
     },
     {
-      "decision_point": "D9",
+      "decision_point": "D10",
       "type": "XOR",
+      "kind": "business decision",
+      "rule_candidate": "channel (online vs bank)",
       "cases": 31411,
       "visits": 31411,
       "branches": 2
     },
     {
-      "decision_point": "D10",
+      "decision_point": "D11",
       "type": "XOR",
+      "kind": "bookkeeping",
+      "rule_candidate": "",
       "cases": 27669,
       "visits": 27669,
       "branches": 2
     },
     {
-      "decision_point": "D11",
-      "type": "self-loop",
-      "cases": 21795,
-      "visits": 23475,
-      "branches": 2
-    },
-    {
       "decision_point": "D12",
       "type": "XOR",
-      "cases": 21795,
-      "visits": 23295,
+      "kind": "business decision",
+      "rule_candidate": "W_Handle leads (manual lead handling)",
+      "cases": 20339,
+      "visits": 20339,
       "branches": 2
     },
     {
       "decision_point": "D13",
       "type": "self-loop",
-      "cases": 14950,
-      "visits": 22943,
+      "kind": "bookkeeping",
+      "rule_candidate": "",
+      "cases": 14877,
+      "visits": 19204,
       "branches": 2
     },
     {
       "decision_point": "D14",
-      "type": "self-loop",
-      "cases": 14724,
-      "visits": 18877,
-      "branches": 2
-    },
-    {
-      "decision_point": "D15",
-      "type": "self-loop",
-      "cases": 3720,
-      "visits": 4695,
+      "type": "XOR",
+      "kind": "bookkeeping",
+      "rule_candidate": "",
+      "cases": 14877,
+      "visits": 14877,
       "branches": 2
     }
   ]

@@ -1,4 +1,4 @@
-"""Section 3.5 - decision point inventory and branching probabilities on the final Petri net.
+"""Section 2.3 (decision mining) - decision point inventory and branching probabilities on the final Petri net.
 
 Decision point = place with >= 2 outgoing arcs (in a Petri net every such place is a choice:
 exactly one of its output transitions consumes the token). Classification (professor, Nov 6):
@@ -15,6 +15,18 @@ Branch frequencies come from the optimal alignments (de Leoni & van der Aalst 20
 or model move fires a transition; a firing of t counts as "branch t taken" at each decision
 place in t's preset. Counts are weighted by the number of cases per variant. Silent branches are
 described by the first visible activities they lead to.
+
+Kind (our interpretation, rule-based on the branch targets, see kind_of):
+  business decision        the branches lead to different business outcomes or paths: outcome
+                           (A_Pending / A_Denied / A_Cancelled), channel (A_Submitted), another
+                           offer (loop over the offer block), incomplete documents (A_Incomplete),
+                           lead handling (W_Handle leads), offer returned by the customer
+  bookkeeping              repeats once per open offer after the outcome (O_Cancelled, O_Refused),
+                           or only decides whether cancellation events follow, which the outcome
+                           decision already fixed: no separate decision
+  repetition               self-loop of a single activity/work item (e.g. a second call)
+  optional-activity skip   XOR between doing an activity (block) and a silent skip
+rule_candidate names the decision-mining hypothesis a business decision belongs to.
 
 Output: results/decision_points.csv (one row per branch), results/decision_points.json
 Run after final_model.py:  python src/decision_points.py
@@ -108,6 +120,40 @@ def classify(net, im):
     return points
 
 
+OUTCOMES = {"A_Pending", "A_Denied", "A_Cancelled", "O_Accepted"}
+BOOKKEEPING = {"O_Cancelled", "O_Refused"}
+AFTER_CANCEL = BOOKKEEPING | {"A_Cancelled", "end"}
+
+
+def kind_of(info: dict, targets: list[set]) -> tuple[str, str]:
+    """(kind, rule_candidate) of one decision point from its type, loop body and the first
+    visible activities of each branch."""
+    body = set(info["loop_body"])
+    every = set().union(*targets)
+    if info["type"] == "loop decision" and "O_Create Offer" in body:
+        return "business decision", "multiple offers"
+    if body and body <= BOOKKEEPING or any(t and t <= BOOKKEEPING for t in targets):
+        return "bookkeeping", ""
+    if all(t <= AFTER_CANCEL for t in targets):  # repeats the outcome decision (cancel or not)
+        return "bookkeeping", ""
+    if "A_Incomplete" in body or any(t == {"A_Incomplete"} for t in targets):
+        return "business decision", "incomplete loop"
+    if any(t == {"A_Submitted"} for t in targets):
+        return "business decision", "channel (online vs bank)"
+    if any(t == {"W_Handle leads"} for t in targets):
+        return "business decision", "W_Handle leads (manual lead handling)"
+    if any("O_Returned" in t and not t & OUTCOMES for t in targets):
+        return "business decision", "offer returned vs not (customer, 30-day timer)"
+    distinct_outcomes = [t & OUTCOMES for t in targets if t & OUTCOMES and len(t & OUTCOMES) == len(t - {"end"})]
+    if len({frozenset(o) for o in distinct_outcomes}) >= 2:
+        return "business decision", "outcome"
+    if info["type"] == "self-loop":
+        return "repetition", ""
+    if info["type"] == "loop decision":
+        return "repetition", ""
+    return "optional-activity skip", ""
+
+
 def main():
     df, cfg = final_log()
     net, im, fm = pm4py.read_pnml(str(RES / "models" / "final.pnml"))
@@ -135,10 +181,12 @@ def main():
     for i, (p, info) in enumerate(sorted(points.items(), key=lambda kv: -sum(
             taken[(kv[0], a.target.name)] for a in kv[0].out_arcs))):
         total = sum(taken[(p, a.target.name)] for a in p.out_arcs)
+        kind, cand = kind_of(info, [set(leads_to(a.target)) for a in p.out_arcs])
         for a in p.out_arcs:
             t = a.target
             n = taken[(p, t.name)]
             rows.append({"decision_point": f"D{i + 1}", "place": p.name, "type": info["type"],
+                         "kind": kind, "rule_candidate": cand,
                          "loop_body": "; ".join(info["loop_body"]),
                          "cases_reaching": visits_cases[p], "visits": total,
                          "branch_transition": t.name, "branch_label": t.label or "tau",
@@ -148,14 +196,15 @@ def main():
     tab = pd.DataFrame(rows)
     tab.to_csv(RES / "decision_points.csv", index=False)
     summary = tab.groupby("decision_point", sort=False).agg(
-        type=("type", "first"), cases=("cases_reaching", "first"), visits=("visits", "first"),
+        type=("type", "first"), kind=("kind", "first"), rule_candidate=("rule_candidate", "first"), cases=("cases_reaching", "first"), visits=("visits", "first"),
         branches=("branch_transition", "size")).reset_index()
     (RES / "decision_points.json").write_text(json.dumps(
         {"configuration": cfg["id"], "counts_by_type": summary["type"].value_counts().to_dict(),
+         "counts_by_kind": summary["kind"].value_counts().to_dict(),
          "points": summary.to_dict("records")}, indent=2))
     pd.set_option("display.width", 200, "display.max_colwidth", 60)
     print(summary.to_string(index=False))
-    print(tab[["decision_point", "type", "branch_leads_to", "branch_is_loop_back", "count", "probability"]]
+    print(tab[["decision_point", "kind", "branch_leads_to", "branch_is_loop_back", "count", "probability"]]
           .to_string(index=False))
 
 

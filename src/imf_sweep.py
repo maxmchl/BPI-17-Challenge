@@ -1,4 +1,4 @@
-"""Section 3.3 - IMf noise-threshold sweep: fitness vs precision trade-off (first iteration-log rows).
+"""Section 2.3 - IMf noise-threshold sweep: fitness vs precision trade-off (first iteration-log rows).
 
 For each noise threshold the IMf model is discovered on the A_+O_ log and evaluated with the
 full metric set (src/metrics.py). Thresholds 0.0 (= plain IM) and 0.2 are taken from
