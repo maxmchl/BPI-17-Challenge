@@ -1,11 +1,12 @@
-"""Section 3.3 - temporal generalization of the final configuration (drift check).
+"""Section 2.3 - temporal generalization of the final configuration (drift check).
 
 The log covers cases started in 2016 (ending 1 Feb 2017); weekly arrivals jump from ~500 to
 ~700 around June 2016. A model that generalizes should replay cases from a period it was not
 discovered on about as well as its own period.
 
 (a) Temporal split by case start (first event): H1 = Jan-Jun 2016, H2 = Jul-Dec 2016.
-    Discover with the final configuration on one half, evaluate on both halves
+    Discover with the final configuration on one half (variant filter applied within that half),
+    evaluate on all cases of both halves
     (fitting cases and fitness from alignments, ETC precision with token replay).
     Also records whether IMf discovers the identical process tree on H1, H2 and the full log.
 (b) The full-log model: share of fitting cases (alignments) per start month.
@@ -21,7 +22,7 @@ import pandas as pd
 import pm4py
 
 from load import ROOT, CASE, TS
-from preprocess import final_log
+from preprocess import final_log, discover
 from metrics import align, timed
 from pm4py.algo.evaluation.replay_fitness.variants import alignment_based as align_fitness
 from figures_stats import C, W, INK2, plt
@@ -45,13 +46,13 @@ def score(log, net, im, fm) -> dict:
             "alignments_failed": len(al) - len(ok), "t_alignments": t}
 
 
-def split(log, noise, start):
+def split(log, cfg, start):
     halves = {"H1 (Jan-Jun)": start.index[start.dt.month <= 6],
               "H2 (Jul-Dec)": start.index[start.dt.month > 6]}
     logs = {k: log[log[CASE].isin(ids)] for k, ids in halves.items()}
     out = []
     for train, ltrain in logs.items():
-        net, im, fm = pm4py.discover_petri_net_inductive(ltrain, noise_threshold=noise)
+        net, im, fm = discover(ltrain, cfg)
         for test, ltest in logs.items():
             r = {"discovered_on": train, "evaluated_on": test, "in_sample": train == test,
                  "places": len(net.places), "transitions": len(net.transitions), **score(ltest, net, im, fm)}
@@ -61,8 +62,8 @@ def split(log, noise, start):
     return out
 
 
-def by_month(log, noise, start):
-    net, im, fm = pm4py.discover_petri_net_inductive(log, noise_threshold=noise)
+def by_month(log, cfg, start):
+    net, im, fm = discover(log, cfg)
     elog = pm4py.convert_to_event_log(log)
     ids = [t.attributes["concept:name"] for t in elog]
     al = align(elog, net, im, fm)
@@ -102,16 +103,16 @@ def plot(tab):
 
 def main():
     log, cfg = final_log()
-    noise = cfg["noise_threshold"]
     start = case_start(log)
-    print(f"final configuration {cfg['id']}: log {cfg['log']}, noise {noise}", flush=True)
+    print(f"final configuration {cfg['id']}: log {cfg['log']}, {cfg.get('algorithm', 'IMf')} "
+          f"noise {cfg['noise_threshold']}, coverage {cfg.get('coverage')}", flush=True)
     halves = [log[log[CASE].isin(start.index[m])] for m in (start.dt.month <= 6, start.dt.month > 6)]
-    trees = [str(pm4py.discover_process_tree_inductive(x, noise_threshold=noise)) for x in [*halves, log]]
+    trees = [str(discover(x, cfg, tree=True)) for x in [*halves, log]]
     same = {"H1 == H2": trees[0] == trees[1], "H1 == full log": trees[0] == trees[2]}
     print("identical process trees:", same, flush=True)
-    out = {"configuration": cfg["id"], "identical_process_trees": same, "split": split(log, noise, start)}
+    out = {"configuration": cfg["id"], "identical_process_trees": same, "split": split(log, cfg, start)}
     (RES / "temporal_split.json").write_text(json.dumps(out, indent=2))
-    tab = by_month(log, noise, start)
+    tab = by_month(log, cfg, start)
     out["fitting_by_month"] = tab.reset_index().to_dict("records")
     (RES / "temporal_split.json").write_text(json.dumps(out, indent=2))
     print(tab.round(3).to_string(), flush=True)
