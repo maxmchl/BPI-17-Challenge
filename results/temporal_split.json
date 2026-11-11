@@ -1,0 +1,135 @@
+{
+  "configuration": "It1",
+  "identical_process_trees": {
+    "H1 == H2": true,
+    "H1 == full log": true
+  },
+  "split": [
+    {
+      "discovered_on": "H1 (Jan-Jun)",
+      "evaluated_on": "H1 (Jan-Jun)",
+      "in_sample": true,
+      "places": 30,
+      "transitions": 43,
+      "cases": 14306,
+      "fit_traces_align_pct": 92.73731301551797,
+      "fitness_align": 0.995031256342158,
+      "precision_tbr": 0.5675857377753606,
+      "alignments_failed": 0,
+      "t_alignments": 17.934119041077793
+    },
+    {
+      "discovered_on": "H1 (Jan-Jun)",
+      "evaluated_on": "H2 (Jul-Dec)",
+      "in_sample": false,
+      "places": 30,
+      "transitions": 43,
+      "cases": 17105,
+      "fit_traces_align_pct": 93.17743349897691,
+      "fitness_align": 0.9955172860165601,
+      "precision_tbr": 0.5811885143704434,
+      "alignments_failed": 0,
+      "t_alignments": 18.723389166989364
+    },
+    {
+      "discovered_on": "H2 (Jul-Dec)",
+      "evaluated_on": "H1 (Jan-Jun)",
+      "in_sample": false,
+      "places": 30,
+      "transitions": 43,
+      "cases": 14306,
+      "fit_traces_align_pct": 92.73731301551797,
+      "fitness_align": 0.995031256342158,
+      "precision_tbr": 0.5675857377753606,
+      "alignments_failed": 0,
+      "t_alignments": 17.436008332995698
+    },
+    {
+      "discovered_on": "H2 (Jul-Dec)",
+      "evaluated_on": "H2 (Jul-Dec)",
+      "in_sample": true,
+      "places": 30,
+      "transitions": 43,
+      "cases": 17105,
+      "fit_traces_align_pct": 93.17743349897691,
+      "fitness_align": 0.9955172860165601,
+      "precision_tbr": 0.5811885143704434,
+      "alignments_failed": 0,
+      "t_alignments": 19.513614249997772
+    }
+  ],
+  "fitting_by_month": [
+    {
+      "start_month": "2016-01",
+      "cases": 2194,
+      "fitting_pct": 92.75296262534184,
+      "mean_fitness": 0.9962550788248941
+    },
+    {
+      "start_month": "2016-02",
+      "cases": 2412,
+      "fitting_pct": 93.5737976782753,
+      "mean_fitness": 0.9964878935844174
+    },
+    {
+      "start_month": "2016-03",
+      "cases": 2454,
+      "fitting_pct": 92.70578647106764,
+      "mean_fitness": 0.9959630739044404
+    },
+    {
+      "start_month": "2016-04",
+      "cases": 2177,
+      "fitting_pct": 92.14515388148828,
+      "mean_fitness": 0.9956559624878574
+    },
+    {
+      "start_month": "2016-05",
+      "cases": 2068,
+      "fitting_pct": 92.11798839458413,
+      "mean_fitness": 0.9958317682649634
+    },
+    {
+      "start_month": "2016-06",
+      "cases": 3001,
+      "fitting_pct": 92.93568810396535,
+      "mean_fitness": 0.9961458763937051
+    },
+    {
+      "start_month": "2016-07",
+      "cases": 3039,
+      "fitting_pct": 92.8923988153998,
+      "mean_fitness": 0.9961682137696934
+    },
+    {
+      "start_month": "2016-08",
+      "cases": 3085,
+      "fitting_pct": 92.90113452188007,
+      "mean_fitness": 0.9962913682021959
+    },
+    {
+      "start_month": "2016-09",
+      "cases": 3042,
+      "fitting_pct": 94.14858645627876,
+      "mean_fitness": 0.9968257265906956
+    },
+    {
+      "start_month": "2016-10",
+      "cases": 2994,
+      "fitting_pct": 93.82097528390113,
+      "mean_fitness": 0.9966609161879515
+    },
+    {
+      "start_month": "2016-11",
+      "cases": 2665,
+      "fitting_pct": 92.3076923076923,
+      "mean_fitness": 0.9958743447963961
+    },
+    {
+      "start_month": "2016-12",
+      "cases": 2280,
+      "fitting_pct": 92.80701754385964,
+      "mean_fitness": 0.9962576881826887
+    }
+  ]
+}
