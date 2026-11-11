@@ -1,0 +1,87 @@
+{
+  "configuration": "It1",
+  "cases": 31411,
+  "variants": 2253,
+  "fitting_by_offers": {
+    "1": {
+      "cases": 22900,
+      "fitting": 22680,
+      "fitting_pct": 99.04
+    },
+    "2": {
+      "cases": 6549,
+      "fitting": 5316,
+      "fitting_pct": 81.17
+    },
+    "3": {
+      "cases": 1337,
+      "fitting": 870,
+      "fitting_pct": 65.07
+    },
+    "4+": {
+      "cases": 625,
+      "fitting": 339,
+      "fitting_pct": 54.24
+    }
+  },
+  "fit_verdicts (tbr default, tbr not-in-model, alignments) -> cases": {
+    "(True, True, True)": 29205,
+    "(False, False, False)": 2206
+  },
+  "generalization_gap": [],
+  "knock_on_example": {
+    "variant_rank": 189,
+    "cases": 10,
+    "trace": [
+      "A_Create Application",
+      "A_Submitted",
+      "A_Concept",
+      "A_Accepted",
+      "O_Create Offer",
+      "O_Created",
+      "O_Create Offer",
+      "O_Created",
+      "O_Cancelled",
+      "O_Cancelled",
+      "O_Create Offer",
+      "O_Created",
+      "O_Create Offer",
+      "O_Created",
+      "O_Sent",
+      "O_Sent",
+      "A_Complete",
+      "A_Cancelled",
+      "O_Cancelled",
+      "O_Cancelled"
+    ],
+    "tbr_fitness": 0.9736842105263158,
+    "tbr_missing": 1,
+    "tbr_remaining": 1,
+    "tbr_consumed": 38,
+    "tbr_produced": 38,
+    "align_fitness": 0.92,
+    "align_cost": 20016,
+    "align_moves": [
+      "A_Create Application",
+      "A_Submitted",
+      "A_Concept",
+      "A_Accepted",
+      "O_Create Offer",
+      "O_Created",
+      "O_Create Offer",
+      "O_Created",
+      "[log: O_Cancelled]",
+      "[log: O_Cancelled]",
+      "O_Create Offer",
+      "O_Created",
+      "O_Create Offer",
+      "O_Created",
+      "O_Sent",
+      "O_Sent",
+      "A_Complete",
+      "A_Cancelled",
+      "O_Cancelled",
+      "O_Cancelled"
+    ]
+  }
+}

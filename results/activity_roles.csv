@@ -1,0 +1,18 @@
+activity,in_model,type,executed_or_triggered_by,lane,justification,events,cases,share_user_1,resources
+A_Accepted,True,state,bank,Bank,"first assessment passed, the bank will make an offer (recorded by employees only)",31411.0,31411.0,0.0,113.0
+A_Complete,True,state,bank,Bank,application completed and offers sent; the bank now waits for the customer,31264.0,31264.0,0.0,113.0
+A_Concept,True,state,system,Bank,application becomes a concept after the lead is handled; partly automatic (User_1),31411.0,31411.0,0.539,114.0
+A_Denied,True,state,bank,Bank,outcome: application rejected by the bank,3753.0,3752.0,0.0,99.0
+A_Incomplete,True,state,bank,Bank,validation found missing documents; the customer has to send them (next move: customer),22968.0,14958.0,0.0,101.0
+A_Pending,True,state,bank,Bank,"outcome: offer accepted after validation, loan to be paid out",17228.0,17228.0,0.0,40.0
+A_Validating,True,state,bank,Bank,returned documents are being validated by the bank,38726.0,21825.0,0.0,127.0
+O_Accepted,True,state,bank,Bank,offer accepted after validation (together with A_Pending),17228.0,17228.0,0.0,40.0
+O_Create Offer,True,state,bank,Bank,employee creates an offer,42815.0,31411.0,0.0,120.0
+O_Created,True,state,system,Bank,"offer object created, immediately follows O_Create Offer",42815.0,31411.0,0.0,120.0
+O_Refused,True,state,bank,Bank,offer refused (together with A_Denied),4695.0,3720.0,0.0,97.0
+O_Sent,True,state,bank,Bank,offer sent to the customer (both channels merged),41554.0,31264.0,0.0,120.0
+A_Cancelled,True,state,customer / timer,Customer,"outcome: customer withdrew or no reply in ~30 days (mostly User_1, i.e. automatic)",10431.0,10431.0,0.762,108.0
+A_Create Application,True,state,customer,Customer,application created online by the customer or entered by an employee on their behalf,31411.0,31411.0,0.648,111.0
+A_Submitted,True,state,customer,Customer,only in online applications; customer submits the form (always recorded by User_1),20339.0,20339.0,1.0,1.0
+O_Cancelled,True,state,customer / timer,Customer,"offer cancelled: new offer replaces it, customer withdrew, or timeout",20892.0,15676.0,0.478,133.0
+O_Returned,True,state,customer,Customer,customer returns the signed offer documents,23256.0,21723.0,0.0,47.0

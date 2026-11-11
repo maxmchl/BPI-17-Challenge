@@ -6,12 +6,18 @@
 3. HM soundness evidence (Woflan does not terminate on these nets): workflow-net check and
    the alignment of the most frequent trace (where does the model get stuck?).
 
+`final` mode (after final_model.py) repeats 1. and 2. on the final model and adds the fitting
+cases by number of offers (the loop around the offer block) and the cross-tabulation of the fit
+verdicts of TBR (default / not-in-model counted) and alignments.
+
 Works on one trace per variant (weights = case counts), models from results/models/*.pnml.
-Outputs: results/conformance_examples.json (+ printed report)
+Outputs: results/conformance_examples.json, results/conformance_final.json (+ printed report)
 Run after discovery.py:  python src/conformance_examples.py
+         after final_model.py:  python src/conformance_examples.py final
 """
 from collections import Counter
 import json
+import sys
 import warnings
 
 import pm4py
@@ -19,8 +25,8 @@ from pm4py.algo.conformance.tokenreplay import algorithm as tbr_algo
 from pm4py.objects.log.obj import EventLog
 
 from load import ROOT, CASE, ACT
-from preprocess import ao_log
-from metrics import align, is_workflow_net
+from preprocess import ao_log, final_log
+from metrics import align, is_workflow_net, tbr_fitness
 
 warnings.filterwarnings("ignore", category=UserWarning)
 RES = ROOT / "results"
@@ -120,5 +126,34 @@ def main():
     print(json.dumps(out, indent=2, default=str))
 
 
+def main_final():
+    df, cfg = final_log()
+    log, weights, variants = variant_log(df)
+    net, im, fm = pm4py.read_pnml(str(RES / "models" / "final.pnml"))
+    tbr = tbr_diag(log, net, im, fm)
+    _, tbr_nim = tbr_fitness(log, net, im, fm, not_in_model=True)
+    al = align(log, net, im, fm)
+    total = int(weights.sum())
+
+    offers = Counter(), Counter()
+    combos = Counter()
+    for v, t, tn, a, w in zip(variants, tbr, tbr_nim, al, weights):
+        n = sum(x == "O_Create Offer" for x in v)
+        key = str(n) if n < 4 else "4+"
+        fit = a is not None and a["fitness"] == 1.0
+        offers[0][key] += int(w)
+        offers[1][key] += int(w) * fit
+        combos[str((t["trace_is_fit"], tn["trace_is_fit"], fit))] += int(w)
+    out = {"configuration": cfg["id"], "cases": total, "variants": len(variants),
+           "fitting_by_offers": {k: {"cases": offers[0][k], "fitting": offers[1][k],
+                                     "fitting_pct": round(100 * offers[1][k] / offers[0][k], 2)}
+                                 for k in sorted(offers[0])},
+           "fit_verdicts (tbr default, tbr not-in-model, alignments) -> cases": dict(combos.most_common()),
+           "generalization_gap": generalization_gap(net, tbr, al, weights),
+           "knock_on_example": trace_example(tbr, al, weights, variants)}
+    (RES / "conformance_final.json").write_text(json.dumps(out, indent=2, default=str))
+    print(json.dumps(out, indent=2, default=str))
+
+
 if __name__ == "__main__":
-    main()
+    main_final() if sys.argv[1:] == ["final"] else main()
