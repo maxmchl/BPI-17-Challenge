@@ -65,7 +65,9 @@ Report structure (report/main.tex): 1 Introduction; 2 Approach and Results with 
 - Cancelled cases spike at ~31 days, which suggests an automatic cancellation timer. Check the reports; if confirmed, model it as a timer event, and decision mining should rediscover it.
 - Weekly arrivals jump around June 2016 (~500 to ~700/week); all cases start in 2016, the log ends 1 Feb 2017.
 - Slowest decile: ~1.9 offers per case vs 1.2 in the fastest decile; mostly cancelled.
-- Literature notes on six BPIC'17 reports: Claude Project doc `claude/literature_notes_bpic17_reports.md` (copy into `docs/` locally).
+- Literature notes on eight BPIC'17 reports (six professional + the two winners): `docs/literature_notes_bpic17_reports.md` (local, not versioned).
+- **Rodrigues et al. 2017 (academic winner):** hand-built Petri net in 19 versions (closest precedent to our iteration log), fitness 97.28 % / precision 98.72 % on 7 clustered activities (events < 2 min apart by the same user merged), so not comparable with our activity-level model; no generalization/simplicity, not reproducible from code.
+- **Povalyaeva et al. 2017 (student winner):** no structural drift (ProM concept-drift plug-in), only a volume split in June 2016; feature candidates for the outcome decision: first withdrawal amount, number of terms, monthly cost, requested amount (> 40,000), time to first offer (all in our base feature set except time to first offer, covered by days since first offer).
 
 ## Findings from discovery (Nov 5, log A = A_+O_ complete, 31,411 cases)
 
@@ -97,6 +99,10 @@ Report structure (report/main.tex): 1 Introduction; 2 Approach and Results with 
   - D9 outcome 0.77 / 0.70: nothing after the last O_Sent and no O_Returned -> A_Cancelled 98.9 % (30-day timer); returned + incomplete -> A_Pending 83-87 %; Denied is hard (no incomplete round, New credit -> Denied only 39 %).
   - Leakage run D9 (+ CreditScore, Selected, Accepted): balanced accuracy 0.91, CreditScore top SHAP feature (0.28, next 0.11) -> confirms the leakage (van der Ham 2017).
   - Surrogate fidelity 0.97-0.99; SHAP top-k vs DT split features agree 0.67 (D10), 1.0 (D6), 0.8 (D9).
+  - With vs without resource/time features: D10 with them learns only `last resource = User_1 -> online` (accuracy 1.0, a tautology: the system creates online applications); D6 and D9 unchanged (only small last_hour leaves). Business rules for the BPMN come from the version without resource/time.
+- **BPMN guards** (`src/bpmn_annotations.py`, `results/bpmn_annotations.json`): lanes per activity and one annotation per gateway (rules for D6/D9/D10, probabilities for the rest), located by the activities before the place. For the Signavio remodel; if it changes the structure, rerun decision_points + decision_mining on the re-imported model.
+- **Trade-off figure** `figures/tradeoff_panels.pdf`: fitting vs precision / generalization / CNC for every iteration row, final model ringed.
+- **CSV vs XES** (`results/csv_xes_check.json`): the CSV in data/ is identical to the 4TU XES (all events, values, timestamps); the pipeline stays on the XES. Report: "XES from 4TU, DOI 10.4121/uuid:5f3067df-f10b-45da-b98b-86ae4c7a310b".
 - **Swimlanes** (`results/activity_roles.csv`): Customer (A_Create Application, A_Submitted, O_Returned), Bank employees (all W_ + employee-recorded A_/O_ states, share User_1 = 0), System (A_Concept 54 %, A_Cancelled 76 %, O_Cancelled 48 % User_1; 30-day timer).
 - **W_ statistics** (`results/w_stats.*`): W_ = 63.9 % of all events; 4.07 +- 2.11 work items started per case; e.g. W_Call after offers ends in ate_abort 89.8 %, W_Handle leads in withdraw 82.2 %.
 
@@ -111,7 +117,7 @@ Abstract + intro ~0.6, setup ~0.3, statistics ~0.6, process model ~2, decision m
 | Nov 4-5 | DONE: repo, statistics, literature, discovery (IM, IMf, HM), IMf sweep |
 | Nov 10-11 | DONE: log B1/B1c, iteration log, TBR rerun (PM4Py bug), temporal split, final model It6_c75, decision point inventory |
 | Nov 11-12 | Signavio remodel with three swimlanes (Customer / Bank employees / System), re-import + re-evaluate |
-| Nov 12-13 | Decision mining: classify decisions, 2-3 with rules (DT + MLP/SHAP), probabilities for the rest |
+| Nov 14 | DONE: decision mining D10/D6/D9 (DT + MLP/SHAP + surrogate, leakage and resource/time runs), BPMN guard texts, trade-off panels, CSV check |
 | from Nov ~11 | Option 1 in Signavio, in parallel, once the account arrives |
 | Nov 14-17 | Writing, trade-off section, declaration, README |
 | Nov 18-19 | Buffer; submit by Nov 19, 23:59 |
@@ -122,6 +128,6 @@ Abstract + intro ~0.6, setup ~0.3, statistics ~0.6, process model ~2, decision m
 - Report: LaTeX in `report/` (TUM template, `latexmk` via `report/latexmkrc`), built by LaTeX Workshop into `report/build/`; it reads `../figures/` and `../results/` directly.
 - Python env: `.venv` is a symlink to `~/.venvs/bpic17` (venv refuses paths containing `:`).
 - `python src/load.py` caches the log as `data/bpic17.parquet`; other scripts call `load_log()`.
-- Reproduce order: load -> stats -> figures_stats -> w_stats -> preprocess (redundancy check) -> discovery -> imf_sweep -> tbr_rerun -> conformance_examples -> iterations -> final_choice -> temporal -> final_model -> conformance_examples final -> decision_points -> decision_mining. Long runs write their JSON incrementally and skip finished rows.
+- Reproduce order: load -> stats -> figures_stats -> w_stats -> preprocess (redundancy check) -> discovery -> imf_sweep -> tbr_rerun -> conformance_examples -> iterations -> final_choice -> temporal -> final_model -> conformance_examples final -> decision_points -> decision_mining -> bpmn_annotations; tradeoff_panels after final_choice; csv_xes_check anytime. Long runs write their JSON incrementally and skip finished rows.
 - Figures: one-column width 3.4 in, serif font, validated categorical palette `#2a78d6 #eb6834 #1baf7a #eda100` (fixed order).
 - Max prefers complete, runnable scripts and concise prose; explain concepts with concrete numbers first.
