@@ -4,7 +4,9 @@ Stage 1 - log version by modeling purpose. The model is the base for a simulatio
   what the bank executes (professor, Nov 6: only W_ events are executed by the bank). Hence the
   work items have to be in the log: W_ events at lifecycle start, one per work item started by an
   employee (log B1). B1c additionally drops O_Created / O_Accepted / O_Refused, which only
-  duplicate information (results/b1c_redundancy.json). Log A (It1, 93.0 % fitting, precision
+  duplicate information (results/b1c_redundancy.json). B1c is NOT more precise than B1 (75 %
+  coverage: 0.700 vs 0.710, same fitting cases); it is chosen only because it removes redundant
+  events and gives a smaller model (size 163 vs 182). Log A (It1, 93.0 % fitting, precision
   0.589) stays in the report as the A_/O_ backbone.
 Stage 2 - selection rule within that log version. ETC precision is not comparable across logs with
   different activity sets (more activities = more possible continuations), so the rule is applied
@@ -37,6 +39,18 @@ def c_reason(rows: dict) -> str:
             f"items end in ate_abort/withdraw, so lifecycle complete loses most bank work")
 
 
+def b1_reason(rows: dict, chosen: dict) -> str:
+    """B1 vs B1c at the chosen coverage: no precision claim, only redundancy and size."""
+    b1 = next((r for r in rows.values() if r["log"] == "B1" and r.get("coverage") == chosen["coverage"]), None)
+    if b1 is None:
+        return "same variants as B1c, plus three activities without own information"
+    return (f"same variants as B1c plus three redundant activities (O_Created, O_Accepted, O_Refused). "
+            f"At {chosen['coverage']:g} % coverage B1 ({b1['id']}) has {b1['fit_traces_align_pct']:.1f} % fitting "
+            f"and precision {b1['precision_tbr']:.3f} vs B1c {chosen['fit_traces_align_pct']:.1f} % / "
+            f"{chosen['precision_tbr']:.3f}: B1c is not more precise. B1c is chosen only because it removes "
+            f"redundant events (size {chosen['own_size']} vs {b1['own_size']})")
+
+
 def choose(rows: dict) -> dict:
     cand = [r for r in rows.values() if r["log"] == FINAL_LOG and not r.get("drop_rare_w")]
     chosen = best(cand)
@@ -59,7 +73,7 @@ def choose(rows: dict) -> dict:
                 "A": "no work items, so no bank lane and no resources/processing times for simulation; "
                      "kept as the A_/O_ backbone (It1)",
                 "C (all activities, lifecycle complete; professor's choice)": c_reason(rows),
-                "B1": "same variants as B1c, plus three activities without own information"},
+                "B1": b1_reason(rows, chosen)},
         },
         "stage_2_rule": (f"within {FINAL_LOG} (same activity set): highest ETC precision (token replay, full "
                          f"log) among rows with fitting cases (alignments, full log) >= {FIT_TARGET:g} %; "
