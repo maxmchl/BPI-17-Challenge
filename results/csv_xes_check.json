@@ -1,0 +1,67 @@
+{
+  "xes": {
+    "cases": 31509,
+    "events": 1202267,
+    "activities": 26,
+    "lifecycle_values": [
+      "ate_abort",
+      "complete",
+      "resume",
+      "schedule",
+      "start",
+      "suspend",
+      "withdraw"
+    ],
+    "resources": 149,
+    "first_timestamp_utc": "2016-01-01 09:51:15.304000+00:00",
+    "last_timestamp_utc": "2017-02-01 14:11:03.499000+00:00"
+  },
+  "csv": {
+    "cases": 31509,
+    "events": 1202267,
+    "activities": 26,
+    "lifecycle_values": [
+      "ate_abort",
+      "complete",
+      "resume",
+      "schedule",
+      "start",
+      "suspend",
+      "withdraw"
+    ],
+    "resources": 149,
+    "first_timestamp_utc": "2016-01-01 09:51:15.304000+00:00",
+    "last_timestamp_utc": "2017-02-01 14:11:03.499000+00:00"
+  },
+  "same_summary": true,
+  "event_ids_unique": {
+    "xes": true,
+    "csv": true
+  },
+  "events_only_in_xes": 0,
+  "events_only_in_csv": 0,
+  "differing_values_per_column": {
+    "case:concept:name": 0,
+    "concept:name": 0,
+    "lifecycle:transition": 0,
+    "org:resource": 0,
+    "Action": 0,
+    "EventOrigin": 0,
+    "case:LoanGoal": 0,
+    "case:ApplicationType": 0,
+    "OfferID": 0,
+    "Accepted": 0,
+    "Selected": 0,
+    "case:RequestedAmount": 0,
+    "FirstWithdrawalAmount": 0,
+    "NumberOfTerms": 0,
+    "MonthlyCost": 0,
+    "CreditScore": 0,
+    "OfferedAmount": 0,
+    "time:timestamp": 0
+  },
+  "max_timestamp_difference": "0 days 00:00:00",
+  "identical_events": true,
+  "xes_plain_equals_xes_gz": true,
+  "pipeline_source": "XES from 4TU (data/BPI_Challenge_2017.xes.gz), DOI 10.4121/uuid:5f3067df-f10b-45da-b98b-86ae4c7a310b"
+}
