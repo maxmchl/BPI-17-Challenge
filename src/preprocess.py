@@ -87,7 +87,7 @@ def build_log(version: str = "A", merge_osent: bool = False, collapse_repeats: b
         merge_osent = True
         keep &= ~df[ACT].isin(B1C_DROP)
     if drop_rare_w:
-        keep &= ~df[ACT].isin(RARE_W)
+        keep &= ~df[ACT].str.strip().isin(RARE_W)  # the log has 'W_Shortened completion ' (trailing space)
     out = df[df[CASE].isin(complete_case_ids()) & keep].sort_values([CASE, TS, "EventID"], kind="stable")
     if not keep_attrs:
         out = out[[CASE, ACT, TS]]

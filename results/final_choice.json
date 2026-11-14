@@ -59,10 +59,10 @@
     },
     "B1c without rare W_": {
       "id": "It7",
-      "fit_traces_align_pct": 89.41453630893636,
-      "fitness_align": 0.993604392348809,
-      "precision_tbr": 0.630796566539852,
-      "precision_tbr_discovery_log": 0.4874377781957244,
+      "fit_traces_align_pct": 89.62465378370635,
+      "fitness_align": 0.9937100408843276,
+      "precision_tbr": 0.6312745218679452,
+      "precision_tbr_discovery_log": 0.4875208278669757,
       "own_cnc": 1.236842105263158,
       "own_silent_share": 0.5476190476190477,
       "own_size": 170
