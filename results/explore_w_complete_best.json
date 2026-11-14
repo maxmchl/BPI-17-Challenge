@@ -1,0 +1,271 @@
+{
+  "question": "precision >= 0.8 with >= 80 % fitting cases on W_ complete logs?",
+  "reachable": false,
+  "models_screened": 360,
+  "models_evaluated": 264,
+  "status_counts": {
+    "ok": 264,
+    "skipped": 80,
+    "timeout (> 1200 s)": 16
+  },
+  "fitting_measure": "alignments where computed, otherwise token replay with the not-in-model rule",
+  "best_with_80pct_fitting": [
+    {
+      "log": "C-W50+col",
+      "algorithm": "IM",
+      "param": 0.0,
+      "coverage": 70.0,
+      "activities": 19.0,
+      "model_activities": 18.0,
+      "variants_discovery": 40.0,
+      "fit_traces_tbr_pct": 87.70812772595588,
+      "fit_traces_align_pct": 87.70812772595588,
+      "fitness_align": 0.987106091391389,
+      "precision_tbr": 0.728402140847022,
+      "precision_align": 0.7289090199825873,
+      "generalization_tbr": 0.9919811060623944,
+      "own_size": 117.0,
+      "own_cnc": 1.2075471698113207,
+      "own_silent_share": 0.4,
+      "is_wf_net": true,
+      "activities_of_final_model_missing": [
+        "W_Call after offers",
+        "W_Call incomplete files",
+        "W_Handle leads",
+        "W_Validate application"
+      ],
+      "activities_not_in_final_model": [
+        "O_Accepted",
+        "O_Created",
+        "O_Refused"
+      ]
+    },
+    {
+      "log": "C-W50+col",
+      "algorithm": "IM",
+      "param": 0.0,
+      "coverage": 72.5,
+      "activities": 19.0,
+      "model_activities": 18.0,
+      "variants_discovery": 49.0,
+      "fit_traces_tbr_pct": 87.70812772595588,
+      "fit_traces_align_pct": 87.70812772595588,
+      "fitness_align": 0.987106091391389,
+      "precision_tbr": 0.728402140847022,
+      "precision_align": 0.7289090199825873,
+      "generalization_tbr": 0.9919811060623944,
+      "own_size": 117.0,
+      "own_cnc": 1.2075471698113207,
+      "own_silent_share": 0.4,
+      "is_wf_net": true,
+      "activities_of_final_model_missing": [
+        "W_Call after offers",
+        "W_Call incomplete files",
+        "W_Handle leads",
+        "W_Validate application"
+      ],
+      "activities_not_in_final_model": [
+        "O_Accepted",
+        "O_Created",
+        "O_Refused"
+      ]
+    },
+    {
+      "log": "C-W50+col",
+      "algorithm": "IM",
+      "param": 0.0,
+      "coverage": 75.0,
+      "activities": 19.0,
+      "model_activities": 18.0,
+      "variants_discovery": 60.0,
+      "fit_traces_tbr_pct": 87.70812772595588,
+      "fit_traces_align_pct": 87.70812772595588,
+      "fitness_align": 0.987106091391389,
+      "precision_tbr": 0.728402140847022,
+      "precision_align": 0.7289090199825873,
+      "generalization_tbr": 0.9919811060623944,
+      "own_size": 117.0,
+      "own_cnc": 1.2075471698113207,
+      "own_silent_share": 0.4,
+      "is_wf_net": true,
+      "activities_of_final_model_missing": [
+        "W_Call after offers",
+        "W_Call incomplete files",
+        "W_Handle leads",
+        "W_Validate application"
+      ],
+      "activities_not_in_final_model": [
+        "O_Accepted",
+        "O_Created",
+        "O_Refused"
+      ]
+    },
+    {
+      "log": "C-W50+col",
+      "algorithm": "IM",
+      "param": 0.0,
+      "coverage": 80.0,
+      "activities": 19.0,
+      "model_activities": 18.0,
+      "variants_discovery": 98.0,
+      "fit_traces_tbr_pct": 91.57619942058514,
+      "fit_traces_align_pct": 91.57619942058514,
+      "fitness_align": 0.9952778770686452,
+      "precision_tbr": 0.7022787964173998,
+      "precision_align": null,
+      "generalization_tbr": 0.9919253833249816,
+      "own_size": 113.0,
+      "own_cnc": 1.2156862745098038,
+      "own_silent_share": 0.4,
+      "is_wf_net": true,
+      "activities_of_final_model_missing": [
+        "W_Call after offers",
+        "W_Call incomplete files",
+        "W_Handle leads",
+        "W_Validate application"
+      ],
+      "activities_not_in_final_model": [
+        "O_Accepted",
+        "O_Created",
+        "O_Refused"
+      ]
+    },
+    {
+      "log": "C-W50",
+      "algorithm": "IM",
+      "param": 0.0,
+      "coverage": 75.0,
+      "activities": 19.0,
+      "model_activities": 18.0,
+      "variants_discovery": 61.0,
+      "fit_traces_tbr_pct": 87.60625258667346,
+      "fit_traces_align_pct": 87.60625258667346,
+      "fitness_align": 0.9867447953458172,
+      "precision_tbr": 0.700986214018174,
+      "precision_align": null,
+      "generalization_tbr": 0.9909986137501676,
+      "own_size": 150.0,
+      "own_cnc": 1.2058823529411764,
+      "own_silent_share": 0.5384615384615384,
+      "is_wf_net": true,
+      "activities_of_final_model_missing": [
+        "W_Call after offers",
+        "W_Call incomplete files",
+        "W_Handle leads",
+        "W_Validate application"
+      ],
+      "activities_not_in_final_model": [
+        "O_Accepted",
+        "O_Created",
+        "O_Refused"
+      ]
+    }
+  ],
+  "pareto_front": [
+    {
+      "log": "C-W50+col",
+      "algorithm": "IM",
+      "param": 0.0,
+      "coverage": 40.0,
+      "fit": 50.4282,
+      "precision_tbr": 0.9357
+    },
+    {
+      "log": "C-W50",
+      "algorithm": "IM",
+      "param": 0.0,
+      "coverage": 45.0,
+      "fit": 69.2114,
+      "precision_tbr": 0.9014
+    },
+    {
+      "log": "C-W50+col",
+      "algorithm": "IM",
+      "param": 0.0,
+      "coverage": 55.0,
+      "fit": 72.6593,
+      "precision_tbr": 0.8993
+    },
+    {
+      "log": "C-cluster",
+      "algorithm": "ILP",
+      "param": 1.0,
+      "coverage": 50.0,
+      "fit": 74.7541,
+      "precision_tbr": 0.748
+    },
+    {
+      "log": "C-cluster+col",
+      "algorithm": "ILP",
+      "param": 1.0,
+      "coverage": 50.0,
+      "fit": 74.9037,
+      "precision_tbr": 0.7463
+    },
+    {
+      "log": "C-W50+col",
+      "algorithm": "IM",
+      "param": 0.0,
+      "coverage": 62.5,
+      "fit": 76.747,
+      "precision_tbr": 0.7397
+    },
+    {
+      "log": "C-W50+col",
+      "algorithm": "IM",
+      "param": 0.0,
+      "coverage": 70.0,
+      "fit": 87.7081,
+      "precision_tbr": 0.7284
+    },
+    {
+      "log": "C-W50+col",
+      "algorithm": "IM",
+      "param": 0.0,
+      "coverage": 80.0,
+      "fit": 91.5762,
+      "precision_tbr": 0.7023
+    },
+    {
+      "log": "C-W50",
+      "algorithm": "IM",
+      "param": 0.0,
+      "coverage": 80.0,
+      "fit": 92.1779,
+      "precision_tbr": 0.6751
+    },
+    {
+      "log": "C-rareW+col",
+      "algorithm": "IM",
+      "param": 0.0,
+      "coverage": 75.0,
+      "fit": 96.6731,
+      "precision_tbr": 0.4653
+    },
+    {
+      "log": "C-rareW+col",
+      "algorithm": "IM",
+      "param": 0.0,
+      "coverage": 77.5,
+      "fit": 97.5614,
+      "precision_tbr": 0.4046
+    },
+    {
+      "log": "C-rareW+col",
+      "algorithm": "IM",
+      "param": 0.0,
+      "coverage": 80.0,
+      "fit": 98.803,
+      "precision_tbr": 0.4042
+    },
+    {
+      "log": "C-dup",
+      "algorithm": "IM",
+      "param": 0.0,
+      "coverage": 80.0,
+      "fit": 98.8444,
+      "precision_tbr": 0.3481
+    }
+  ],
+  "final_model_for_comparison": "It6_c75 (log B1c): 89.4 % fitting, precision 0.700 (not comparable: other activity set)"
+}
