@@ -1,0 +1,743 @@
+{
+  "D10 base": {
+    "decision tree": {
+      "text": "|--- cat__case:ApplicationType_New credit <= 0.50\n|   |--- class: bank (no A_Submitted)\n|--- cat__case:ApplicationType_New credit >  0.50\n|   |--- num__case:RequestedAmount <= 4250.00\n|   |   |--- num__case:RequestedAmount <= 1300.00\n|   |   |   |--- class: bank (no A_Submitted)\n|   |   |--- num__case:RequestedAmount >  1300.00\n|   |   |   |--- class: bank (no A_Submitted)\n|   |--- num__case:RequestedAmount >  4250.00\n|   |   |--- num__create_hour <= 20.79\n|   |   |   |--- class: A_Submitted\n|   |   |--- num__create_hour >  20.79\n|   |   |   |--- class: A_Submitted\n",
+      "leaves": [
+        {
+          "if": [
+            "case:ApplicationType != New credit"
+          ],
+          "then": "bank (no A_Submitted)",
+          "test_rows": 1023,
+          "test_distribution": {
+            "bank (no A_Submitted)": 1.0
+          }
+        },
+        {
+          "if": [
+            "case:ApplicationType = New credit",
+            "case:RequestedAmount <= 4250",
+            "case:RequestedAmount <= 1300"
+          ],
+          "then": "bank (no A_Submitted)",
+          "test_rows": 710,
+          "test_distribution": {
+            "bank (no A_Submitted)": 0.996,
+            "A_Submitted": 0.004
+          }
+        },
+        {
+          "if": [
+            "case:ApplicationType = New credit",
+            "case:RequestedAmount <= 4250",
+            "case:RequestedAmount > 1300"
+          ],
+          "then": "bank (no A_Submitted)",
+          "test_rows": 2,
+          "test_distribution": {
+            "bank (no A_Submitted)": 1.0
+          }
+        },
+        {
+          "if": [
+            "case:ApplicationType = New credit",
+            "case:RequestedAmount > 4250",
+            "create_hour <= 20.79"
+          ],
+          "then": "A_Submitted",
+          "test_rows": 6617,
+          "test_distribution": {
+            "A_Submitted": 0.759,
+            "bank (no A_Submitted)": 0.241
+          }
+        },
+        {
+          "if": [
+            "case:ApplicationType = New credit",
+            "case:RequestedAmount > 4250",
+            "create_hour > 20.79"
+          ],
+          "then": "A_Submitted",
+          "test_rows": 1072,
+          "test_distribution": {
+            "A_Submitted": 0.987,
+            "bank (no A_Submitted)": 0.013
+          }
+        }
+      ]
+    },
+    "surrogate": {
+      "text": "|--- cat__case:ApplicationType_Limit raise <= 0.50\n|   |--- num__case:RequestedAmount <= 3250.00\n|   |   |--- cat__case:LoanGoal_Not speficied <= 0.50\n|   |   |   |--- class: bank (no A_Submitted)\n|   |   |--- cat__case:LoanGoal_Not speficied >  0.50\n|   |   |   |--- class: A_Submitted\n|   |--- num__case:RequestedAmount >  3250.00\n|   |   |--- cat__case:LoanGoal_Unknown <= 0.50\n|   |   |   |--- class: A_Submitted\n|   |   |--- cat__case:LoanGoal_Unknown >  0.50\n|   |   |   |--- class: bank (no A_Submitted)\n|--- cat__case:ApplicationType_Limit raise >  0.50\n|   |--- class: bank (no A_Submitted)\n",
+      "leaves": [
+        {
+          "if": [
+            "case:ApplicationType != Limit raise",
+            "case:RequestedAmount <= 3250",
+            "case:LoanGoal != Not speficied"
+          ],
+          "then": "bank (no A_Submitted)",
+          "test_rows": 711,
+          "test_distribution": {
+            "bank (no A_Submitted)": 0.996,
+            "A_Submitted": 0.004
+          }
+        },
+        {
+          "if": [
+            "case:ApplicationType != Limit raise",
+            "case:RequestedAmount <= 3250",
+            "case:LoanGoal = Not speficied"
+          ],
+          "then": "A_Submitted",
+          "test_rows": 0,
+          "test_distribution": {}
+        },
+        {
+          "if": [
+            "case:ApplicationType != Limit raise",
+            "case:RequestedAmount > 3250",
+            "case:LoanGoal != Unknown"
+          ],
+          "then": "A_Submitted",
+          "test_rows": 7624,
+          "test_distribution": {
+            "A_Submitted": 0.797,
+            "bank (no A_Submitted)": 0.203
+          }
+        },
+        {
+          "if": [
+            "case:ApplicationType != Limit raise",
+            "case:RequestedAmount > 3250",
+            "case:LoanGoal = Unknown"
+          ],
+          "then": "bank (no A_Submitted)",
+          "test_rows": 66,
+          "test_distribution": {
+            "bank (no A_Submitted)": 0.97,
+            "A_Submitted": 0.03
+          }
+        },
+        {
+          "if": [
+            "case:ApplicationType = Limit raise"
+          ],
+          "then": "bank (no A_Submitted)",
+          "test_rows": 1023,
+          "test_distribution": {
+            "bank (no A_Submitted)": 1.0
+          }
+        }
+      ]
+    }
+  },
+  "D6 base": {
+    "decision tree": {
+      "text": "|--- num__days_since_first_offer <= 0.01\n|   |--- num__n_offers <= 1.50\n|   |   |--- class: W_Call after offers\n|   |--- num__n_offers >  1.50\n|   |   |--- num__n_work_items <= 1.50\n|   |   |   |--- class: W_Call after offers\n|   |   |--- num__n_work_items >  1.50\n|   |   |   |--- class: no call\n|--- num__days_since_first_offer >  0.01\n|   |--- num__n_offers <= 1.50\n|   |   |--- class: W_Call after offers\n|   |--- num__n_offers >  1.50\n|   |   |--- num__n_work_items <= 1.50\n|   |   |   |--- class: no call\n|   |   |--- num__n_work_items >  1.50\n|   |   |   |--- class: no call\n",
+      "leaves": [
+        {
+          "if": [
+            "days_since_first_offer <= 0.007908",
+            "n_offers <= 1.5"
+          ],
+          "then": "W_Call after offers",
+          "test_rows": 8189,
+          "test_distribution": {
+            "W_Call after offers": 1.0
+          }
+        },
+        {
+          "if": [
+            "days_since_first_offer <= 0.007908",
+            "n_offers > 1.5",
+            "n_work_items <= 1.5"
+          ],
+          "then": "W_Call after offers",
+          "test_rows": 879,
+          "test_distribution": {
+            "W_Call after offers": 0.987,
+            "no call": 0.013
+          }
+        },
+        {
+          "if": [
+            "days_since_first_offer <= 0.007908",
+            "n_offers > 1.5",
+            "n_work_items > 1.5"
+          ],
+          "then": "no call",
+          "test_rows": 320,
+          "test_distribution": {
+            "no call": 0.578,
+            "W_Call after offers": 0.422
+          }
+        },
+        {
+          "if": [
+            "days_since_first_offer > 0.007908",
+            "n_offers <= 1.5"
+          ],
+          "then": "W_Call after offers",
+          "test_rows": 131,
+          "test_distribution": {
+            "W_Call after offers": 1.0
+          }
+        },
+        {
+          "if": [
+            "days_since_first_offer > 0.007908",
+            "n_offers > 1.5",
+            "n_work_items <= 1.5"
+          ],
+          "then": "no call",
+          "test_rows": 113,
+          "test_distribution": {
+            "no call": 0.531,
+            "W_Call after offers": 0.469
+          }
+        },
+        {
+          "if": [
+            "days_since_first_offer > 0.007908",
+            "n_offers > 1.5",
+            "n_work_items > 1.5"
+          ],
+          "then": "no call",
+          "test_rows": 1850,
+          "test_distribution": {
+            "no call": 0.996,
+            "W_Call after offers": 0.004
+          }
+        }
+      ]
+    },
+    "surrogate": {
+      "text": "|--- num__days_since_first_offer <= 0.03\n|   |--- num__n_offers <= 1.50\n|   |   |--- class: W_Call after offers\n|   |--- num__n_offers >  1.50\n|   |   |--- num__n_work_items <= 1.50\n|   |   |   |--- class: W_Call after offers\n|   |   |--- num__n_work_items >  1.50\n|   |   |   |--- class: no call\n|--- num__days_since_first_offer >  0.03\n|   |--- num__n_offers <= 1.50\n|   |   |--- num__days_since_first_offer <= 10.47\n|   |   |   |--- class: W_Call after offers\n|   |   |--- num__days_since_first_offer >  10.47\n|   |   |   |--- class: no call\n|   |--- num__n_offers >  1.50\n|   |   |--- num__n_work_items <= 1.50\n|   |   |   |--- class: no call\n|   |   |--- num__n_work_items >  1.50\n|   |   |   |--- class: no call\n",
+      "leaves": [
+        {
+          "if": [
+            "days_since_first_offer <= 0.03167",
+            "n_offers <= 1.5"
+          ],
+          "then": "W_Call after offers",
+          "test_rows": 8243,
+          "test_distribution": {
+            "W_Call after offers": 1.0
+          }
+        },
+        {
+          "if": [
+            "days_since_first_offer <= 0.03167",
+            "n_offers > 1.5",
+            "n_work_items <= 1.5"
+          ],
+          "then": "W_Call after offers",
+          "test_rows": 921,
+          "test_distribution": {
+            "W_Call after offers": 0.985,
+            "no call": 0.015
+          }
+        },
+        {
+          "if": [
+            "days_since_first_offer <= 0.03167",
+            "n_offers > 1.5",
+            "n_work_items > 1.5"
+          ],
+          "then": "no call",
+          "test_rows": 375,
+          "test_distribution": {
+            "no call": 0.637,
+            "W_Call after offers": 0.363
+          }
+        },
+        {
+          "if": [
+            "days_since_first_offer > 0.03167",
+            "n_offers <= 1.5",
+            "days_since_first_offer <= 10.47"
+          ],
+          "then": "W_Call after offers",
+          "test_rows": 74,
+          "test_distribution": {
+            "W_Call after offers": 1.0
+          }
+        },
+        {
+          "if": [
+            "days_since_first_offer > 0.03167",
+            "n_offers <= 1.5",
+            "days_since_first_offer > 10.47"
+          ],
+          "then": "no call",
+          "test_rows": 3,
+          "test_distribution": {
+            "W_Call after offers": 1.0
+          }
+        },
+        {
+          "if": [
+            "days_since_first_offer > 0.03167",
+            "n_offers > 1.5",
+            "n_work_items <= 1.5"
+          ],
+          "then": "no call",
+          "test_rows": 71,
+          "test_distribution": {
+            "no call": 0.803,
+            "W_Call after offers": 0.197
+          }
+        },
+        {
+          "if": [
+            "days_since_first_offer > 0.03167",
+            "n_offers > 1.5",
+            "n_work_items > 1.5"
+          ],
+          "then": "no call",
+          "test_rows": 1795,
+          "test_distribution": {
+            "no call": 0.997,
+            "W_Call after offers": 0.003
+          }
+        }
+      ]
+    }
+  },
+  "D9 base": {
+    "decision tree": {
+      "text": "|--- num__days_since_last_sent <= 0.01\n|   |--- num__days_since_last_sent <= 0.00\n|   |   |--- num__n_returned <= 0.50\n|   |   |   |--- class: A_Cancelled\n|   |   |--- num__n_returned >  0.50\n|   |   |   |--- class: A_Cancelled\n|   |--- num__days_since_last_sent >  0.00\n|   |   |--- num__n_returned <= 0.50\n|   |   |   |--- class: A_Cancelled\n|   |   |--- num__n_returned >  0.50\n|   |   |   |--- class: A_Pending\n|--- num__days_since_last_sent >  0.01\n|   |--- num__n_incomplete <= 0.50\n|   |   |--- cat__case:ApplicationType_New credit <= 0.50\n|   |   |   |--- class: A_Pending\n|   |   |--- cat__case:ApplicationType_New credit >  0.50\n|   |   |   |--- class: A_Denied\n|   |--- num__n_incomplete >  0.50\n|   |   |--- num__n_work_items <= 4.50\n|   |   |   |--- class: A_Pending\n|   |   |--- num__n_work_items >  4.50\n|   |   |   |--- class: A_Pending\n",
+      "leaves": [
+        {
+          "if": [
+            "days_since_last_sent <= 0.007482 (or missing)",
+            "days_since_last_sent <= 2.524e-05",
+            "n_returned <= 0.5"
+          ],
+          "then": "A_Cancelled",
+          "test_rows": 2794,
+          "test_distribution": {
+            "A_Cancelled": 0.989,
+            "A_Denied": 0.011
+          }
+        },
+        {
+          "if": [
+            "days_since_last_sent <= 0.007482 (or missing)",
+            "days_since_last_sent <= 2.524e-05",
+            "n_returned > 0.5"
+          ],
+          "then": "A_Cancelled",
+          "test_rows": 41,
+          "test_distribution": {
+            "A_Cancelled": 0.854,
+            "A_Pending": 0.098,
+            "A_Denied": 0.049
+          }
+        },
+        {
+          "if": [
+            "days_since_last_sent <= 0.007482 (or missing)",
+            "days_since_last_sent > 2.524e-05 (or missing)",
+            "n_returned <= 0.5"
+          ],
+          "then": "A_Cancelled",
+          "test_rows": 56,
+          "test_distribution": {
+            "A_Cancelled": 0.661,
+            "A_Denied": 0.339
+          }
+        },
+        {
+          "if": [
+            "days_since_last_sent <= 0.007482 (or missing)",
+            "days_since_last_sent > 2.524e-05 (or missing)",
+            "n_returned > 0.5"
+          ],
+          "then": "A_Pending",
+          "test_rows": 15,
+          "test_distribution": {
+            "A_Pending": 0.667,
+            "A_Cancelled": 0.2,
+            "A_Denied": 0.133
+          }
+        },
+        {
+          "if": [
+            "days_since_last_sent > 0.007482",
+            "n_incomplete <= 0.5",
+            "case:ApplicationType != New credit"
+          ],
+          "then": "A_Pending",
+          "test_rows": 441,
+          "test_distribution": {
+            "A_Pending": 0.907,
+            "A_Denied": 0.084,
+            "A_Cancelled": 0.009
+          }
+        },
+        {
+          "if": [
+            "days_since_last_sent > 0.007482",
+            "n_incomplete <= 0.5",
+            "case:ApplicationType = New credit"
+          ],
+          "then": "A_Denied",
+          "test_rows": 1629,
+          "test_distribution": {
+            "A_Pending": 0.587,
+            "A_Denied": 0.392,
+            "A_Cancelled": 0.021
+          }
+        },
+        {
+          "if": [
+            "days_since_last_sent > 0.007482",
+            "n_incomplete > 0.5",
+            "n_work_items <= 4.5"
+          ],
+          "then": "A_Pending",
+          "test_rows": 960,
+          "test_distribution": {
+            "A_Pending": 0.828,
+            "A_Cancelled": 0.126,
+            "A_Denied": 0.046
+          }
+        },
+        {
+          "if": [
+            "days_since_last_sent > 0.007482",
+            "n_incomplete > 0.5",
+            "n_work_items > 4.5"
+          ],
+          "then": "A_Pending",
+          "test_rows": 3488,
+          "test_distribution": {
+            "A_Pending": 0.865,
+            "A_Denied": 0.098,
+            "A_Cancelled": 0.037
+          }
+        }
+      ]
+    },
+    "surrogate": {
+      "text": "|--- num__n_returned <= 0.50\n|   |--- num__days_since_last_sent <= 17.92\n|   |   |--- num__n_work_items <= 5.50\n|   |   |   |--- class: A_Cancelled\n|   |   |--- num__n_work_items >  5.50\n|   |   |   |--- class: A_Denied\n|   |--- num__days_since_last_sent >  17.92\n|   |   |--- num__MonthlyCost <= 247.95\n|   |   |   |--- class: A_Denied\n|   |   |--- num__MonthlyCost >  247.95\n|   |   |   |--- class: A_Cancelled\n|--- num__n_returned >  0.50\n|   |--- num__n_incomplete <= 0.50\n|   |   |--- num__n_work_items <= 3.50\n|   |   |   |--- class: A_Pending\n|   |   |--- num__n_work_items >  3.50\n|   |   |   |--- class: A_Denied\n|   |--- num__n_incomplete >  0.50\n|   |   |--- num__days_since_last_sent <= 0.00\n|   |   |   |--- class: A_Cancelled\n|   |   |--- num__days_since_last_sent >  0.00\n|   |   |   |--- class: A_Pending\n",
+      "leaves": [
+        {
+          "if": [
+            "n_returned <= 0.5",
+            "days_since_last_sent <= 17.92 (or missing)",
+            "n_work_items <= 5.5"
+          ],
+          "then": "A_Cancelled",
+          "test_rows": 2890,
+          "test_distribution": {
+            "A_Cancelled": 0.976,
+            "A_Denied": 0.024
+          }
+        },
+        {
+          "if": [
+            "n_returned <= 0.5",
+            "days_since_last_sent <= 17.92 (or missing)",
+            "n_work_items > 5.5"
+          ],
+          "then": "A_Denied",
+          "test_rows": 4,
+          "test_distribution": {
+            "A_Cancelled": 0.5,
+            "A_Denied": 0.5
+          }
+        },
+        {
+          "if": [
+            "n_returned <= 0.5",
+            "days_since_last_sent > 17.92",
+            "MonthlyCost <= 248"
+          ],
+          "then": "A_Denied",
+          "test_rows": 6,
+          "test_distribution": {
+            "A_Cancelled": 0.667,
+            "A_Denied": 0.333
+          }
+        },
+        {
+          "if": [
+            "n_returned <= 0.5",
+            "days_since_last_sent > 17.92",
+            "MonthlyCost > 248"
+          ],
+          "then": "A_Cancelled",
+          "test_rows": 3,
+          "test_distribution": {
+            "A_Cancelled": 1.0
+          }
+        },
+        {
+          "if": [
+            "n_returned > 0.5",
+            "n_incomplete <= 0.5",
+            "n_work_items <= 3.5"
+          ],
+          "then": "A_Pending",
+          "test_rows": 1753,
+          "test_distribution": {
+            "A_Pending": 0.726,
+            "A_Denied": 0.266,
+            "A_Cancelled": 0.009
+          }
+        },
+        {
+          "if": [
+            "n_returned > 0.5",
+            "n_incomplete <= 0.5",
+            "n_work_items > 3.5"
+          ],
+          "then": "A_Denied",
+          "test_rows": 297,
+          "test_distribution": {
+            "A_Denied": 0.67,
+            "A_Pending": 0.306,
+            "A_Cancelled": 0.024
+          }
+        },
+        {
+          "if": [
+            "n_returned > 0.5",
+            "n_incomplete > 0.5",
+            "days_since_last_sent <= 2.111e-05"
+          ],
+          "then": "A_Cancelled",
+          "test_rows": 40,
+          "test_distribution": {
+            "A_Cancelled": 0.875,
+            "A_Pending": 0.1,
+            "A_Denied": 0.025
+          }
+        },
+        {
+          "if": [
+            "n_returned > 0.5",
+            "n_incomplete > 0.5",
+            "days_since_last_sent > 2.111e-05 (or missing)"
+          ],
+          "then": "A_Pending",
+          "test_rows": 4431,
+          "test_distribution": {
+            "A_Pending": 0.861,
+            "A_Denied": 0.085,
+            "A_Cancelled": 0.054
+          }
+        }
+      ]
+    }
+  },
+  "D9 leakage": {
+    "decision tree": {
+      "text": "|--- num__days_since_last_sent <= 0.01\n|   |--- num__days_since_last_sent <= 0.00\n|   |   |--- cat__Accepted_False <= 0.50\n|   |   |   |--- class: A_Cancelled\n|   |   |--- cat__Accepted_False >  0.50\n|   |   |   |--- class: A_Cancelled\n|   |--- num__days_since_last_sent >  0.00\n|   |   |--- num__CreditScore <= 339.50\n|   |   |   |--- class: A_Cancelled\n|   |   |--- num__CreditScore >  339.50\n|   |   |   |--- class: A_Pending\n|--- num__days_since_last_sent >  0.01\n|   |--- num__CreditScore <= 296.00\n|   |   |--- cat__case:ApplicationType_New credit <= 0.50\n|   |   |   |--- class: A_Pending\n|   |   |--- cat__case:ApplicationType_New credit >  0.50\n|   |   |   |--- class: A_Denied\n|   |--- num__CreditScore >  296.00\n|   |   |--- num__days_since_start <= 44.07\n|   |   |   |--- class: A_Pending\n|   |   |--- num__days_since_start >  44.07\n|   |   |   |--- class: A_Pending\n",
+      "leaves": [
+        {
+          "if": [
+            "days_since_last_sent <= 0.007482 (or missing)",
+            "days_since_last_sent <= 2.524e-05",
+            "Accepted != False"
+          ],
+          "then": "A_Cancelled",
+          "test_rows": 2007,
+          "test_distribution": {
+            "A_Cancelled": 0.99,
+            "A_Denied": 0.008,
+            "A_Pending": 0.002
+          }
+        },
+        {
+          "if": [
+            "days_since_last_sent <= 0.007482 (or missing)",
+            "days_since_last_sent <= 2.524e-05",
+            "Accepted = False"
+          ],
+          "then": "A_Cancelled",
+          "test_rows": 828,
+          "test_distribution": {
+            "A_Cancelled": 0.981,
+            "A_Denied": 0.019
+          }
+        },
+        {
+          "if": [
+            "days_since_last_sent <= 0.007482 (or missing)",
+            "days_since_last_sent > 2.524e-05 (or missing)",
+            "CreditScore <= 339.5"
+          ],
+          "then": "A_Cancelled",
+          "test_rows": 66,
+          "test_distribution": {
+            "A_Cancelled": 0.606,
+            "A_Denied": 0.318,
+            "A_Pending": 0.076
+          }
+        },
+        {
+          "if": [
+            "days_since_last_sent <= 0.007482 (or missing)",
+            "days_since_last_sent > 2.524e-05 (or missing)",
+            "CreditScore > 339.5"
+          ],
+          "then": "A_Pending",
+          "test_rows": 5,
+          "test_distribution": {
+            "A_Pending": 1.0
+          }
+        },
+        {
+          "if": [
+            "days_since_last_sent > 0.007482",
+            "CreditScore <= 296",
+            "case:ApplicationType != New credit"
+          ],
+          "then": "A_Pending",
+          "test_rows": 698,
+          "test_distribution": {
+            "A_Pending": 0.87,
+            "A_Denied": 0.093,
+            "A_Cancelled": 0.037
+          }
+        },
+        {
+          "if": [
+            "days_since_last_sent > 0.007482",
+            "CreditScore <= 296",
+            "case:ApplicationType = New credit"
+          ],
+          "then": "A_Denied",
+          "test_rows": 1585,
+          "test_distribution": {
+            "A_Denied": 0.63,
+            "A_Pending": 0.205,
+            "A_Cancelled": 0.165
+          }
+        },
+        {
+          "if": [
+            "days_since_last_sent > 0.007482",
+            "CreditScore > 296",
+            "days_since_start <= 44.07"
+          ],
+          "then": "A_Pending",
+          "test_rows": 4130,
+          "test_distribution": {
+            "A_Pending": 1.0
+          }
+        },
+        {
+          "if": [
+            "days_since_last_sent > 0.007482",
+            "CreditScore > 296",
+            "days_since_start > 44.07"
+          ],
+          "then": "A_Pending",
+          "test_rows": 105,
+          "test_distribution": {
+            "A_Pending": 1.0
+          }
+        }
+      ]
+    },
+    "surrogate": {
+      "text": "|--- num__n_returned <= 0.50\n|   |--- num__days_since_last_sent <= 7.42\n|   |   |--- num__n_work_items <= 5.50\n|   |   |   |--- class: A_Cancelled\n|   |   |--- num__n_work_items >  5.50\n|   |   |   |--- class: A_Denied\n|   |--- num__days_since_last_sent >  7.42\n|   |   |--- num__create_hour <= 14.53\n|   |   |   |--- class: A_Cancelled\n|   |   |--- num__create_hour >  14.53\n|   |   |   |--- class: A_Denied\n|--- num__n_returned >  0.50\n|   |--- num__CreditScore <= 296.00\n|   |   |--- cat__case:ApplicationType_Limit raise <= 0.50\n|   |   |   |--- class: A_Denied\n|   |   |--- cat__case:ApplicationType_Limit raise >  0.50\n|   |   |   |--- class: A_Pending\n|   |--- num__CreditScore >  296.00\n|   |   |--- class: A_Pending\n",
+      "leaves": [
+        {
+          "if": [
+            "n_returned <= 0.5",
+            "days_since_last_sent <= 7.416 (or missing)",
+            "n_work_items <= 5.5"
+          ],
+          "then": "A_Cancelled",
+          "test_rows": 2878,
+          "test_distribution": {
+            "A_Cancelled": 0.978,
+            "A_Denied": 0.022
+          }
+        },
+        {
+          "if": [
+            "n_returned <= 0.5",
+            "days_since_last_sent <= 7.416 (or missing)",
+            "n_work_items > 5.5"
+          ],
+          "then": "A_Denied",
+          "test_rows": 2,
+          "test_distribution": {
+            "A_Cancelled": 1.0
+          }
+        },
+        {
+          "if": [
+            "n_returned <= 0.5",
+            "days_since_last_sent > 7.416",
+            "create_hour <= 14.53"
+          ],
+          "then": "A_Cancelled",
+          "test_rows": 9,
+          "test_distribution": {
+            "A_Denied": 0.556,
+            "A_Cancelled": 0.444
+          }
+        },
+        {
+          "if": [
+            "n_returned <= 0.5",
+            "days_since_last_sent > 7.416",
+            "create_hour > 14.53"
+          ],
+          "then": "A_Denied",
+          "test_rows": 14,
+          "test_distribution": {
+            "A_Cancelled": 0.643,
+            "A_Denied": 0.357
+          }
+        },
+        {
+          "if": [
+            "n_returned > 0.5",
+            "CreditScore <= 296",
+            "case:ApplicationType != Limit raise"
+          ],
+          "then": "A_Denied",
+          "test_rows": 1580,
+          "test_distribution": {
+            "A_Denied": 0.622,
+            "A_Pending": 0.208,
+            "A_Cancelled": 0.17
+          }
+        },
+        {
+          "if": [
+            "n_returned > 0.5",
+            "CreditScore <= 296",
+            "case:ApplicationType = Limit raise"
+          ],
+          "then": "A_Pending",
+          "test_rows": 701,
+          "test_distribution": {
+            "A_Pending": 0.873,
+            "A_Denied": 0.088,
+            "A_Cancelled": 0.039
+          }
+        },
+        {
+          "if": [
+            "n_returned > 0.5",
+            "CreditScore > 296"
+          ],
+          "then": "A_Pending",
+          "test_rows": 4240,
+          "test_distribution": {
+            "A_Pending": 1.0
+          }
+        }
+      ]
+    }
+  }
+}
