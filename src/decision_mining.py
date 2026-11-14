@@ -46,6 +46,8 @@ SHAP (Park et al. 2022 compare DT vs NN + XAI): PermutationExplainer on the MLP'
   mean over classes). Agreement: share of the DT split features among the top-k SHAP features
   (k = number of distinct DT split features).
 
+Business rules for the BPMN annotations come from without_resource_time (handoff item 7).
+
 Outputs: results/decision_mining.csv (one row per decision point, feature set and model),
          results/decision_rules.json (DT and surrogate rules, leaf rules with test-set support),
          results/decision_mining_shap.json, figures/shap_D10.pdf, figures/shap_D6.pdf,
@@ -108,8 +110,13 @@ def fset(*groups):
 FEATURE_SETS = {
     "base": fset(CASE_F, OFFER_F, COUNT_F, ELAPSED_F, CREATE_F),
     "leakage": fset(CASE_F, OFFER_F, COUNT_F, ELAPSED_F, CREATE_F, LEAK_F),
+    "with_resource_time": fset(CASE_F, OFFER_F, COUNT_F, ELAPSED_F, CREATE_F, RT_F),
+    "without_resource_time": fset(CASE_F, OFFER_F, COUNT_F, ELAPSED_F),
 }
-RUNS = [(d, "base") for d in DECISIONS] + [("D9", "leakage")]
+# with/without resource and time: a tree with "who and when" features tends to learn only that
+# (e.g. User_1, hour <= 16.5); the business rules for the BPMN come from without_resource_time.
+RUNS = ([(d, "base") for d in DECISIONS] + [("D9", "leakage")]
+        + [(d, fs) for d in DECISIONS for fs in ("with_resource_time", "without_resource_time")])
 
 
 # ---------------------------------------------------------------- alignments -> decision visits
