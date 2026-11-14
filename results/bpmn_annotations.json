@@ -1,0 +1,614 @@
+{
+  "model": "results/models/final.pnml / final.bpmn (It6_c75)",
+  "how_to_use": "One XOR gateway per decision point (self-loops and loop decisions as loop-back gateways); attach 'annotation' as a BPMN text annotation to the split gateway. Activities go into the lanes below. If the Signavio remodel changes the structure, rerun decision_points.py and decision_mining.py on the re-imported model.",
+  "lanes": {
+    "Bank employees": [
+      "A_Accepted",
+      "A_Complete",
+      "A_Denied",
+      "A_Incomplete",
+      "A_Pending",
+      "A_Validating",
+      "O_Create Offer",
+      "O_Sent",
+      "W_Call after offers",
+      "W_Call incomplete files",
+      "W_Complete application",
+      "W_Handle leads",
+      "W_Validate application"
+    ],
+    "Customer": [
+      "A_Create Application",
+      "A_Submitted",
+      "O_Returned"
+    ],
+    "System": [
+      "A_Cancelled",
+      "A_Concept",
+      "O_Cancelled"
+    ]
+  },
+  "gateways": [
+    {
+      "decision_point": "D1",
+      "place": "p_16",
+      "type": "XOR",
+      "kind": "optional-activity skip",
+      "rule_candidate": null,
+      "after": [
+        "O_Create Offer"
+      ],
+      "cases_reaching": 31411,
+      "visits": 42724,
+      "branches": [
+        {
+          "transition": "silent (skip_9)",
+          "leads_to": [
+            "A_Cancelled",
+            "A_Denied",
+            "A_Pending",
+            "O_Cancelled",
+            "O_Create Offer",
+            "end"
+          ],
+          "loop_back": false,
+          "probability": 0.1045,
+          "count": 4463
+        },
+        {
+          "transition": "silent (init_loop_10)",
+          "leads_to": [
+            "O_Sent"
+          ],
+          "loop_back": false,
+          "probability": 0.8955,
+          "count": 38261
+        }
+      ],
+      "annotation": "optional-activity skip: skip -> A_Cancelled/A_Denied/A_Pending 10.4 %; skip -> O_Sent 89.5 %",
+      "source": "results/decision_points.csv (alignment-based branching probabilities)"
+    },
+    {
+      "decision_point": "D2",
+      "place": "p_15",
+      "type": "loop decision",
+      "kind": "business decision",
+      "rule_candidate": "multiple offers",
+      "after": [
+        "A_Complete",
+        "A_Incomplete",
+        "A_Validating",
+        "O_Create Offer",
+        "O_Returned",
+        "O_Sent"
+      ],
+      "cases_reaching": 31411,
+      "visits": 42724,
+      "branches": [
+        {
+          "transition": "silent (skip_24)",
+          "leads_to": [
+            "A_Cancelled",
+            "A_Denied",
+            "A_Pending",
+            "O_Cancelled",
+            "end"
+          ],
+          "loop_back": false,
+          "probability": 0.7352,
+          "count": 31411
+        },
+        {
+          "transition": "silent (skip_23)",
+          "leads_to": [
+            "O_Create Offer"
+          ],
+          "loop_back": true,
+          "probability": 0.2648,
+          "count": 11313
+        }
+      ],
+      "annotation": "business decision: skip -> A_Cancelled/A_Denied/A_Pending 73.5 %; skip -> O_Create Offer 26.5 % (no attribute rule mined; probabilities = simulation input)",
+      "source": "results/decision_points.csv (alignment-based branching probabilities)"
+    },
+    {
+      "decision_point": "D3",
+      "place": "p_19",
+      "type": "self-loop",
+      "kind": "repetition",
+      "rule_candidate": null,
+      "after": [
+        "O_Sent"
+      ],
+      "cases_reaching": 31264,
+      "visits": 41444,
+      "branches": [
+        {
+          "transition": "silent (skip_13)",
+          "leads_to": [
+            "A_Cancelled",
+            "A_Denied",
+            "A_Pending",
+            "O_Cancelled",
+            "O_Create Offer",
+            "O_Returned",
+            "W_Call after offers",
+            "W_Validate application",
+            "end"
+          ],
+          "loop_back": false,
+          "probability": 0.9232,
+          "count": 38261
+        },
+        {
+          "transition": "silent (skip_12)",
+          "leads_to": [
+            "O_Sent"
+          ],
+          "loop_back": true,
+          "probability": 0.0768,
+          "count": 3183
+        }
+      ],
+      "annotation": "repetition: skip -> A_Cancelled/A_Denied/A_Pending 92.3 %; skip -> O_Sent 7.7 %",
+      "source": "results/decision_points.csv (alignment-based branching probabilities)"
+    },
+    {
+      "decision_point": "D4",
+      "place": "p_30",
+      "type": "XOR",
+      "kind": "business decision",
+      "rule_candidate": "documents incomplete or not (W_Call incomplete files)",
+      "after": [
+        "A_Validating"
+      ],
+      "cases_reaching": 21825,
+      "visits": 38731,
+      "branches": [
+        {
+          "transition": "W_Call incomplete files",
+          "leads_to": [
+            "W_Call incomplete files"
+          ],
+          "loop_back": false,
+          "probability": 0.5918,
+          "count": 22921
+        },
+        {
+          "transition": "silent (skip_20)",
+          "leads_to": [
+            "A_Cancelled",
+            "A_Denied",
+            "A_Pending",
+            "O_Cancelled",
+            "O_Create Offer",
+            "W_Validate application",
+            "end"
+          ],
+          "loop_back": false,
+          "probability": 0.4082,
+          "count": 15810
+        }
+      ],
+      "annotation": "business decision: W_Call incomplete files 59.2 %; skip -> A_Cancelled/A_Denied/A_Pending 40.8 % (no attribute rule mined; probabilities = simulation input)",
+      "source": "results/decision_points.csv (alignment-based branching probabilities)"
+    },
+    {
+      "decision_point": "D5",
+      "place": "p_28",
+      "type": "loop decision",
+      "kind": "business decision",
+      "rule_candidate": "incomplete loop",
+      "after": [
+        "A_Incomplete",
+        "A_Validating"
+      ],
+      "cases_reaching": 21825,
+      "visits": 38731,
+      "branches": [
+        {
+          "transition": "silent (tauJoin_17)",
+          "leads_to": [
+            "A_Cancelled",
+            "A_Denied",
+            "A_Pending",
+            "O_Cancelled",
+            "O_Create Offer",
+            "end"
+          ],
+          "loop_back": false,
+          "probability": 0.6057,
+          "count": 23458
+        },
+        {
+          "transition": "silent (skip_21)",
+          "leads_to": [
+            "W_Validate application"
+          ],
+          "loop_back": true,
+          "probability": 0.3943,
+          "count": 15273
+        }
+      ],
+      "annotation": "business decision: skip -> A_Cancelled/A_Denied/A_Pending 60.6 %; skip -> W_Validate application 39.4 % (no attribute rule mined; probabilities = simulation input)",
+      "source": "results/decision_points.csv (alignment-based branching probabilities)"
+    },
+    {
+      "decision_point": "D6",
+      "place": "p_17",
+      "type": "XOR",
+      "kind": "business decision",
+      "rule_candidate": "call after offers or not (W_Call after offers)",
+      "after": [
+        "O_Sent"
+      ],
+      "cases_reaching": 31264,
+      "visits": 38261,
+      "branches": [
+        {
+          "transition": "silent (skip_14)",
+          "leads_to": [
+            "A_Cancelled",
+            "A_Denied",
+            "A_Pending",
+            "O_Cancelled",
+            "O_Create Offer",
+            "O_Returned",
+            "W_Validate application",
+            "end"
+          ],
+          "loop_back": false,
+          "probability": 0.1825,
+          "count": 6981
+        },
+        {
+          "transition": "W_Call after offers",
+          "leads_to": [
+            "W_Call after offers"
+          ],
+          "loop_back": false,
+          "probability": 0.8175,
+          "count": 31280
+        }
+      ],
+      "guards": [
+        "IF days_since_first_offer <= 11 min AND n_offers <= 1 THEN W_Call after offers (100.0 % of 8,189 test visits)",
+        "IF days_since_first_offer > 11 min AND n_offers >= 2 AND n_work_items >= 2 THEN no call (99.6 % of 1,850 test visits)",
+        "IF days_since_first_offer <= 11 min AND n_offers >= 2 AND n_work_items <= 1 THEN W_Call after offers (98.7 % of 879 test visits)",
+        "IF days_since_first_offer <= 11 min AND n_offers >= 2 AND n_work_items >= 2 THEN no call (57.8 % of 320 test visits)"
+      ],
+      "reading": "W_Call after offers is one work item per offer round: the first offer always starts a call, an offer created while work items already run does not start a new one.",
+      "annotation": "call after offers: IF days_since_first_offer <= 11 min AND n_offers <= 1 THEN W_Call after offers (100.0 % of 8,189 test visits) | IF days_since_first_offer > 11 min AND n_offers >= 2 AND n_work_items >= 2 THEN no call (99.6 % of 1,850 test visits) | IF days_since_first_offer <= 11 min AND n_offers >= 2 AND n_work_items <= 1 THEN W_Call after offers (98.7 % of 879 test visits) | IF days_since_first_offer <= 11 min AND n_offers >= 2 AND n_work_items >= 2 THEN no call (57.8 % of 320 test visits) [decision tree depth 3, balanced accuracy 0.99 vs baseline 0.50; branching: skip -> A_Cancelled/A_Denied/A_Pending 18.2 %; W_Call after offers 81.8 %]",
+      "source": "results/decision_rules.json, D6 without_resource_time"
+    },
+    {
+      "decision_point": "D7",
+      "place": "p_21",
+      "type": "XOR",
+      "kind": "business decision",
+      "rule_candidate": "offer returned vs not (customer, 30-day timer)",
+      "after": [
+        "A_Complete",
+        "O_Sent"
+      ],
+      "cases_reaching": 31264,
+      "visits": 38261,
+      "branches": [
+        {
+          "transition": "silent (tauSplit_16)",
+          "leads_to": [
+            "O_Returned",
+            "W_Validate application"
+          ],
+          "loop_back": false,
+          "probability": 0.6131,
+          "count": 23458
+        },
+        {
+          "transition": "silent (skip_15)",
+          "leads_to": [
+            "A_Cancelled",
+            "A_Denied",
+            "A_Pending",
+            "O_Cancelled",
+            "O_Create Offer",
+            "end"
+          ],
+          "loop_back": false,
+          "probability": 0.3869,
+          "count": 14803
+        }
+      ],
+      "annotation": "business decision: skip -> O_Returned/W_Validate application 61.3 %; skip -> A_Cancelled/A_Denied/A_Pending 38.7 % (no attribute rule mined; probabilities = simulation input)",
+      "source": "results/decision_points.csv (alignment-based branching probabilities)"
+    },
+    {
+      "decision_point": "D8",
+      "place": "p_8",
+      "type": "XOR",
+      "kind": "optional-activity skip",
+      "rule_candidate": null,
+      "after": [
+        "A_Create Application",
+        "A_Submitted",
+        "W_Handle leads"
+      ],
+      "cases_reaching": 31411,
+      "visits": 31411,
+      "branches": [
+        {
+          "transition": "W_Complete application",
+          "leads_to": [
+            "W_Complete application"
+          ],
+          "loop_back": false,
+          "probability": 0.9387,
+          "count": 29484
+        },
+        {
+          "transition": "silent (skip_6)",
+          "leads_to": [
+            "A_Accepted"
+          ],
+          "loop_back": false,
+          "probability": 0.0613,
+          "count": 1927
+        }
+      ],
+      "annotation": "optional-activity skip: W_Complete application 93.9 %; skip -> A_Accepted 6.1 %",
+      "source": "results/decision_points.csv (alignment-based branching probabilities)"
+    },
+    {
+      "decision_point": "D9",
+      "place": "p_13",
+      "type": "XOR",
+      "kind": "business decision",
+      "rule_candidate": "outcome",
+      "after": [
+        "A_Complete",
+        "A_Incomplete",
+        "A_Validating",
+        "O_Create Offer",
+        "O_Returned",
+        "O_Sent"
+      ],
+      "cases_reaching": 31411,
+      "visits": 31411,
+      "branches": [
+        {
+          "transition": "A_Pending",
+          "leads_to": [
+            "A_Pending"
+          ],
+          "loop_back": false,
+          "probability": 0.5485,
+          "count": 17228
+        },
+        {
+          "transition": "A_Denied",
+          "leads_to": [
+            "A_Denied"
+          ],
+          "loop_back": false,
+          "probability": 0.1191,
+          "count": 3742
+        },
+        {
+          "transition": "silent (skip_25)",
+          "leads_to": [
+            "A_Cancelled",
+            "O_Cancelled",
+            "end"
+          ],
+          "loop_back": false,
+          "probability": 0.3324,
+          "count": 10441
+        }
+      ],
+      "guards": [
+        "IF days_since_last_sent > 11 min AND n_incomplete >= 1 AND n_work_items >= 5 THEN A_Pending (86.5 % of 3,488 test visits)",
+        "IF days_since_last_sent <= 2 s AND n_returned <= 0 THEN A_Cancelled (98.9 % of 2,794 test visits)",
+        "IF ApplicationType = New credit AND days_since_last_sent > 11 min AND n_incomplete <= 0 THEN A_Denied (39.2 % of 1,629 test visits)",
+        "IF days_since_last_sent > 11 min AND n_incomplete >= 1 AND n_work_items <= 4 THEN A_Pending (82.8 % of 960 test visits)",
+        "IF ApplicationType != New credit AND days_since_last_sent > 11 min AND n_incomplete <= 0 THEN A_Pending (90.7 % of 441 test visits)"
+      ],
+      "reading": "No activity after the last O_Sent and no returned offer -> cancelled by the 30-day timer; a validated application with an incomplete-documents round mostly ends pending; denial is hard to predict from data known before the decision (CreditScore would leak the outcome).",
+      "annotation": "outcome: IF days_since_last_sent > 11 min AND n_incomplete >= 1 AND n_work_items >= 5 THEN A_Pending (86.5 % of 3,488 test visits) | IF days_since_last_sent <= 2 s AND n_returned <= 0 THEN A_Cancelled (98.9 % of 2,794 test visits) | IF ApplicationType = New credit AND days_since_last_sent > 11 min AND n_incomplete <= 0 THEN A_Denied (39.2 % of 1,629 test visits) | IF days_since_last_sent > 11 min AND n_incomplete >= 1 AND n_work_items <= 4 THEN A_Pending (82.8 % of 960 test visits) | IF ApplicationType != New credit AND days_since_last_sent > 11 min AND n_incomplete <= 0 THEN A_Pending (90.7 % of 441 test visits) [decision tree depth 3, balanced accuracy 0.76 vs baseline 0.33; branching: A_Pending 54.9 %; A_Denied 11.9 %; skip -> A_Cancelled/O_Cancelled/end 33.2 %]",
+      "source": "results/decision_rules.json, D9 without_resource_time"
+    },
+    {
+      "decision_point": "D10",
+      "place": "p_4",
+      "type": "XOR",
+      "kind": "business decision",
+      "rule_candidate": "channel (online vs bank)",
+      "after": [
+        "A_Create Application"
+      ],
+      "cases_reaching": 31411,
+      "visits": 31411,
+      "branches": [
+        {
+          "transition": "silent (skip_2)",
+          "leads_to": [
+            "A_Accepted",
+            "A_Concept",
+            "W_Complete application"
+          ],
+          "loop_back": false,
+          "probability": 0.3525,
+          "count": 11072
+        },
+        {
+          "transition": "A_Submitted",
+          "leads_to": [
+            "A_Submitted"
+          ],
+          "loop_back": false,
+          "probability": 0.6475,
+          "count": 20339
+        }
+      ],
+      "guards": [
+        "IF ApplicationType = New credit AND LoanGoal != Unknown AND RequestedAmount > 4250 THEN A_Submitted (79.7 % of 7,623 test visits)",
+        "IF ApplicationType != New credit THEN bank (no A_Submitted) (100.0 % of 1,023 test visits)",
+        "IF ApplicationType = New credit AND RequestedAmount <= 1300 THEN bank (no A_Submitted) (99.6 % of 710 test visits)"
+      ],
+      "reading": "Limit raises and small requested amounts are entered by the bank; new credit with a larger amount mostly comes in online. Resource features would only learn 'created by User_1 = online'.",
+      "annotation": "channel (online vs bank): IF ApplicationType = New credit AND LoanGoal != Unknown AND RequestedAmount > 4250 THEN A_Submitted (79.7 % of 7,623 test visits) | IF ApplicationType != New credit THEN bank (no A_Submitted) (100.0 % of 1,023 test visits) | IF ApplicationType = New credit AND RequestedAmount <= 1300 THEN bank (no A_Submitted) (99.6 % of 710 test visits) [decision tree depth 3, balanced accuracy 0.77 vs baseline 0.50; branching: skip -> A_Accepted/A_Concept/W_Complete application 35.2 %; A_Submitted 64.8 %]",
+      "source": "results/decision_rules.json, D10 without_resource_time"
+    },
+    {
+      "decision_point": "D11",
+      "place": "p_34",
+      "type": "XOR",
+      "kind": "bookkeeping",
+      "rule_candidate": null,
+      "after": [
+        "A_Complete",
+        "A_Incomplete",
+        "A_Pending",
+        "A_Validating",
+        "O_Create Offer",
+        "O_Returned",
+        "O_Sent"
+      ],
+      "cases_reaching": 27669,
+      "visits": 27669,
+      "branches": [
+        {
+          "transition": "silent (tauSplit_27)",
+          "leads_to": [
+            "A_Cancelled",
+            "O_Cancelled",
+            "end"
+          ],
+          "loop_back": false,
+          "probability": 0.5377,
+          "count": 14877
+        },
+        {
+          "transition": "silent (skip_26)",
+          "leads_to": [
+            "end"
+          ],
+          "loop_back": false,
+          "probability": 0.4623,
+          "count": 12792
+        }
+      ],
+      "annotation": "bookkeeping: skip -> A_Cancelled/O_Cancelled/end 53.8 %; skip -> end 46.2 %",
+      "source": "results/decision_points.csv (alignment-based branching probabilities)"
+    },
+    {
+      "decision_point": "D12",
+      "place": "p_6",
+      "type": "XOR",
+      "kind": "business decision",
+      "rule_candidate": "W_Handle leads (manual lead handling)",
+      "after": [
+        "A_Submitted"
+      ],
+      "cases_reaching": 20339,
+      "visits": 20339,
+      "branches": [
+        {
+          "transition": "silent (skip_3)",
+          "leads_to": [
+            "A_Accepted",
+            "A_Concept",
+            "W_Complete application"
+          ],
+          "loop_back": false,
+          "probability": 0.822,
+          "count": 16718
+        },
+        {
+          "transition": "W_Handle leads",
+          "leads_to": [
+            "W_Handle leads"
+          ],
+          "loop_back": false,
+          "probability": 0.178,
+          "count": 3621
+        }
+      ],
+      "annotation": "business decision: skip -> A_Accepted/A_Concept/W_Complete application 82.2 %; W_Handle leads 17.8 % (no attribute rule mined; probabilities = simulation input)",
+      "source": "results/decision_points.csv (alignment-based branching probabilities)"
+    },
+    {
+      "decision_point": "D13",
+      "place": "p_40",
+      "type": "self-loop",
+      "kind": "bookkeeping",
+      "rule_candidate": null,
+      "after": [
+        "O_Cancelled"
+      ],
+      "cases_reaching": 14877,
+      "visits": 19204,
+      "branches": [
+        {
+          "transition": "silent (tauJoin_28)",
+          "leads_to": [
+            "end"
+          ],
+          "loop_back": false,
+          "probability": 0.7747,
+          "count": 14877
+        },
+        {
+          "transition": "silent (skip_32)",
+          "leads_to": [
+            "O_Cancelled"
+          ],
+          "loop_back": true,
+          "probability": 0.2253,
+          "count": 4327
+        }
+      ],
+      "annotation": "bookkeeping: skip -> end 77.5 %; skip -> O_Cancelled 22.5 %",
+      "source": "results/decision_points.csv (alignment-based branching probabilities)"
+    },
+    {
+      "decision_point": "D14",
+      "place": "p_35",
+      "type": "XOR",
+      "kind": "bookkeeping",
+      "rule_candidate": null,
+      "after": [
+        "A_Complete",
+        "A_Incomplete",
+        "A_Pending",
+        "A_Validating",
+        "O_Create Offer",
+        "O_Returned",
+        "O_Sent"
+      ],
+      "cases_reaching": 14877,
+      "visits": 14877,
+      "branches": [
+        {
+          "transition": "silent (skip_29)",
+          "leads_to": [
+            "end"
+          ],
+          "loop_back": false,
+          "probability": 0.2989,
+          "count": 4446
+        },
+        {
+          "transition": "A_Cancelled",
+          "leads_to": [
+            "A_Cancelled"
+          ],
+          "loop_back": false,
+          "probability": 0.7011,
+          "count": 10431
+        }
+      ],
+      "annotation": "bookkeeping: skip -> end 29.9 %; A_Cancelled 70.1 %",
+      "source": "results/decision_points.csv (alignment-based branching probabilities)"
+    }
+  ]
+}
