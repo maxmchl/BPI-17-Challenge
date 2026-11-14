@@ -20,13 +20,20 @@ Kind (our interpretation, rule-based on the branch targets, see kind_of):
   business decision        the branches lead to different business outcomes or paths: outcome
                            (A_Pending / A_Denied / A_Cancelled), channel (A_Submitted), another
                            offer (loop over the offer block), incomplete documents (A_Incomplete),
-                           lead handling (W_Handle leads), offer returned by the customer
+                           lead handling (W_Handle leads), offer returned by the customer, and the
+                           two work items whose skip is itself a business fact: W_Call incomplete
+                           files (documents incomplete or not) and W_Call after offers (customer
+                           called after the offer or not)
   bookkeeping              repeats once per open offer after the outcome (O_Cancelled, O_Refused),
                            or only decides whether cancellation events follow, which the outcome
                            decision already fixed: no separate decision
   repetition               self-loop of a single activity/work item (e.g. a second call)
   optional-activity skip   XOR between doing an activity (block) and a silent skip
 rule_candidate names the decision-mining hypothesis a business decision belongs to.
+
+IDs D1..Dn are fixed per place in results/decision_point_ids.json (first assigned by number of
+visits; places with equal visits would otherwise get an arbitrary order). New places get the next
+free ID. Rebuild that file only if results/models/final.pnml changes.
 
 Output: results/decision_points.csv (one row per branch), results/decision_points.json
 Run after final_model.py:  python src/decision_points.py
@@ -47,6 +54,20 @@ from conformance_examples import variant_log
 
 warnings.filterwarnings("ignore", category=UserWarning)
 RES = ROOT / "results"
+IDS = RES / "decision_point_ids.json"
+
+
+def point_ids(points, visits) -> dict:
+    ids = json.loads(IDS.read_text()) if IDS.exists() else {}
+    known = {k: v for k, v in ids.items() if not k.startswith("_")}
+    nxt = 1 + max((int(v[1:]) for v in known.values()), default=0)
+    for p in sorted(points, key=lambda p: (-visits(p), p.name)):
+        if p.name not in known:
+            known[p.name] = f"D{nxt}"
+            nxt += 1
+    IDS.write_text(json.dumps({"_note": ids.get("_note", "decision point IDs per place of final.pnml"),
+                               **known}, indent=2))
+    return {p: known[p.name] for p in points}
 
 
 def dominators(net, im):
@@ -142,6 +163,10 @@ def kind_of(info: dict, targets: list[set]) -> tuple[str, str]:
         return "business decision", "channel (online vs bank)"
     if any(t == {"W_Handle leads"} for t in targets):
         return "business decision", "W_Handle leads (manual lead handling)"
+    if any(t == {"W_Call incomplete files"} for t in targets):
+        return "business decision", "documents incomplete or not (W_Call incomplete files)"
+    if any(t == {"W_Call after offers"} for t in targets):
+        return "business decision", "call after offers or not (W_Call after offers)"
     if any("O_Returned" in t and not t & OUTCOMES for t in targets):
         return "business decision", "offer returned vs not (customer, 30-day timer)"
     distinct_outcomes = [t & OUTCOMES for t in targets if t & OUTCOMES and len(t & OUTCOMES) == len(t - {"end"})]
@@ -177,15 +202,15 @@ def main():
         for p in seen:
             visits_cases[p] += int(w)
 
+    ids = point_ids(points, lambda p: sum(taken[(p, a.target.name)] for a in p.out_arcs))
     rows = []
-    for i, (p, info) in enumerate(sorted(points.items(), key=lambda kv: -sum(
-            taken[(kv[0], a.target.name)] for a in kv[0].out_arcs))):
+    for p, info in sorted(points.items(), key=lambda kv: int(ids[kv[0]][1:])):
         total = sum(taken[(p, a.target.name)] for a in p.out_arcs)
         kind, cand = kind_of(info, [set(leads_to(a.target)) for a in p.out_arcs])
         for a in p.out_arcs:
             t = a.target
             n = taken[(p, t.name)]
-            rows.append({"decision_point": f"D{i + 1}", "place": p.name, "type": info["type"],
+            rows.append({"decision_point": ids[p], "place": p.name, "type": info["type"],
                          "kind": kind, "rule_candidate": cand,
                          "loop_body": "; ".join(info["loop_body"]),
                          "cases_reaching": visits_cases[p], "visits": total,

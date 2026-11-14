@@ -1,0 +1,17 @@
+{
+  "_note": "Fixed decision point IDs (place name in results/models/final.pnml -> ID), first assigned by visits on Nov 11. Kept so that references in the report stay valid; rebuild only if final.pnml changes.",
+  "p_16": "D1",
+  "p_15": "D2",
+  "p_19": "D3",
+  "p_30": "D4",
+  "p_28": "D5",
+  "p_17": "D6",
+  "p_21": "D7",
+  "p_8": "D8",
+  "p_13": "D9",
+  "p_4": "D10",
+  "p_34": "D11",
+  "p_6": "D12",
+  "p_40": "D13",
+  "p_35": "D14"
+}

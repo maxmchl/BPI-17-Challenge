@@ -5,19 +5,19 @@ D2,p_15,loop decision,business decision,multiple offers,A_Complete; A_Incomplete
 D2,p_15,loop decision,business decision,multiple offers,A_Complete; A_Incomplete; A_Validating; O_Create Offer; O_Returned; O_Sent; W_Call after offers; W_Call incomplete files; W_Validate application,31411,42724,skip_23,tau,O_Create Offer,True,11313,0.2648
 D3,p_19,self-loop,repetition,,O_Sent,31264,41444,skip_13,tau,A_Cancelled; A_Denied; A_Pending; O_Cancelled; O_Create Offer; O_Returned; W_Call after offers; W_Validate application; end,False,38261,0.9232
 D3,p_19,self-loop,repetition,,O_Sent,31264,41444,skip_12,tau,O_Sent,True,3183,0.0768
-D4,p_30,XOR,optional-activity skip,,,21825,38731,ade03927-cf2b-44c6-91d7-8efe24760515,W_Call incomplete files,W_Call incomplete files,False,22921,0.5918
-D4,p_30,XOR,optional-activity skip,,,21825,38731,skip_20,tau,A_Cancelled; A_Denied; A_Pending; O_Cancelled; O_Create Offer; W_Validate application; end,False,15810,0.4082
+D4,p_30,XOR,business decision,documents incomplete or not (W_Call incomplete files),,21825,38731,ade03927-cf2b-44c6-91d7-8efe24760515,W_Call incomplete files,W_Call incomplete files,False,22921,0.5918
+D4,p_30,XOR,business decision,documents incomplete or not (W_Call incomplete files),,21825,38731,skip_20,tau,A_Cancelled; A_Denied; A_Pending; O_Cancelled; O_Create Offer; W_Validate application; end,False,15810,0.4082
 D5,p_28,loop decision,business decision,incomplete loop,A_Incomplete; A_Validating; W_Call incomplete files; W_Validate application,21825,38731,tauJoin_17,tau,A_Cancelled; A_Denied; A_Pending; O_Cancelled; O_Create Offer; end,False,23458,0.6057
 D5,p_28,loop decision,business decision,incomplete loop,A_Incomplete; A_Validating; W_Call incomplete files; W_Validate application,21825,38731,skip_21,tau,W_Validate application,True,15273,0.3943
-D6,p_17,XOR,optional-activity skip,,,31264,38261,skip_14,tau,A_Cancelled; A_Denied; A_Pending; O_Cancelled; O_Create Offer; O_Returned; W_Validate application; end,False,6981,0.1825
-D6,p_17,XOR,optional-activity skip,,,31264,38261,533963da-7bb1-4371-a1ac-b12c583913a5,W_Call after offers,W_Call after offers,False,31280,0.8175
+D6,p_17,XOR,business decision,call after offers or not (W_Call after offers),,31264,38261,skip_14,tau,A_Cancelled; A_Denied; A_Pending; O_Cancelled; O_Create Offer; O_Returned; W_Validate application; end,False,6981,0.1825
+D6,p_17,XOR,business decision,call after offers or not (W_Call after offers),,31264,38261,533963da-7bb1-4371-a1ac-b12c583913a5,W_Call after offers,W_Call after offers,False,31280,0.8175
 D7,p_21,XOR,business decision,"offer returned vs not (customer, 30-day timer)",,31264,38261,tauSplit_16,tau,O_Returned; W_Validate application,False,23458,0.6131
 D7,p_21,XOR,business decision,"offer returned vs not (customer, 30-day timer)",,31264,38261,skip_15,tau,A_Cancelled; A_Denied; A_Pending; O_Cancelled; O_Create Offer; end,False,14803,0.3869
 D8,p_8,XOR,optional-activity skip,,,31411,31411,d5d36884-0b3a-438f-b352-b1e7a061dcbe,W_Complete application,W_Complete application,False,29484,0.9387
 D8,p_8,XOR,optional-activity skip,,,31411,31411,skip_6,tau,A_Accepted,False,1927,0.0613
 D9,p_13,XOR,business decision,outcome,,31411,31411,2ebe1d30-30fc-4997-8949-9a5216ce36b9,A_Pending,A_Pending,False,17228,0.5485
-D9,p_13,XOR,business decision,outcome,,31411,31411,skip_25,tau,A_Cancelled; O_Cancelled; end,False,10441,0.3324
 D9,p_13,XOR,business decision,outcome,,31411,31411,1915d735-701c-461b-8a68-9f6d29b42796,A_Denied,A_Denied,False,3742,0.1191
+D9,p_13,XOR,business decision,outcome,,31411,31411,skip_25,tau,A_Cancelled; O_Cancelled; end,False,10441,0.3324
 D10,p_4,XOR,business decision,channel (online vs bank),,31411,31411,skip_2,tau,A_Accepted; A_Concept; W_Complete application,False,11072,0.3525
 D10,p_4,XOR,business decision,channel (online vs bank),,31411,31411,849796e8-0277-4d37-9315-b2699d65dff0,A_Submitted,A_Submitted,False,20339,0.6475
 D11,p_34,XOR,bookkeeping,,,27669,27669,tauSplit_27,tau,A_Cancelled; O_Cancelled; end,False,14877,0.5377

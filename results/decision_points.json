@@ -6,9 +6,9 @@
     "self-loop": 2
   },
   "counts_by_kind": {
-    "business decision": 6,
-    "optional-activity skip": 4,
+    "business decision": 8,
     "bookkeeping": 3,
+    "optional-activity skip": 2,
     "repetition": 1
   },
   "points": [
@@ -42,8 +42,8 @@
     {
       "decision_point": "D4",
       "type": "XOR",
-      "kind": "optional-activity skip",
-      "rule_candidate": "",
+      "kind": "business decision",
+      "rule_candidate": "documents incomplete or not (W_Call incomplete files)",
       "cases": 21825,
       "visits": 38731,
       "branches": 2
@@ -60,8 +60,8 @@
     {
       "decision_point": "D6",
       "type": "XOR",
-      "kind": "optional-activity skip",
-      "rule_candidate": "",
+      "kind": "business decision",
+      "rule_candidate": "call after offers or not (W_Call after offers)",
       "cases": 31264,
       "visits": 38261,
       "branches": 2
