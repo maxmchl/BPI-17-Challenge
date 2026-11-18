@@ -1,0 +1,11 @@
+rank,cases,share_pct,offers,events,sequence,fitness_align,fits,log_moves,model_moves
+1,3673,11.69,1,11,A.Create A.Sub A.Concept W.ComplApp A.Acc O.Create O.Sent W.CallOff A.Compl A.Canc O.Canc,1.0,yes,,
+2,1454,4.63,1,17,A.Create A.Sub A.Concept W.ComplApp A.Acc O.Create O.Sent W.CallOff A.Compl W.Valid A.Valid O.Ret W.CallInc A.Incompl W.Valid A.Valid A.Pend,1.0,yes,,
+3,1383,4.4,1,10,A.Create W.ComplApp A.Concept A.Acc O.Create O.Sent W.CallOff A.Compl A.Canc O.Canc,1.0,yes,,
+4,1367,4.35,1,13,A.Create A.Sub A.Concept W.ComplApp A.Acc O.Create O.Sent W.CallOff A.Compl W.Valid A.Valid O.Ret A.Pend,1.0,yes,,
+5,1197,3.81,1,12,A.Create A.Concept W.ComplApp A.Acc O.Create O.Sent W.CallOff A.Compl W.Valid A.Valid O.Ret A.Pend,1.0,yes,,
+6,902,2.87,1,15,A.Create A.Sub A.Concept W.ComplApp A.Acc O.Create O.Sent W.CallOff A.Compl W.Valid A.Valid O.Ret W.CallInc A.Incompl A.Pend,1.0,yes,,
+7,892,2.84,1,12,A.Create A.Sub W.Leads W.ComplApp A.Concept A.Acc O.Create O.Sent W.CallOff A.Compl A.Canc O.Canc,1.0,yes,,
+8,798,2.54,1,16,A.Create W.ComplApp A.Concept A.Acc O.Create O.Sent W.CallOff A.Compl W.Valid A.Valid O.Ret W.CallInc A.Incompl W.Valid A.Valid A.Pend,1.0,yes,,
+9,719,2.29,1,13,A.Create A.Sub A.Concept W.ComplApp A.Acc O.Create O.Sent W.CallOff A.Compl W.Valid A.Valid O.Ret A.Deny,1.0,yes,,
+10,702,2.23,1,12,A.Create W.ComplApp A.Concept A.Acc O.Create O.Sent W.CallOff A.Compl W.Valid A.Valid O.Ret A.Pend,1.0,yes,,

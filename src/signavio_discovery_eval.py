@@ -4,8 +4,25 @@
 Input: results/models/signavio_generated.bpmn (versioned copy of data/signavio_bpmn.bpmn).
 Steps
   1. import: lanes/pools, text annotations and associations stripped in a copy
-     (data/signavio_generated_stripped.bpmn, signavio_reimport.strip_bpmn), PM4Py BPMN -> Petri net
-     without changes; label check against the log activities
+     (data/signavio_generated_stripped.bpmn, signavio_reimport.strip_bpmn), PM4Py BPMN -> Petri net;
+     label check against the log activities. PM4Py's direct conversion is unsound (OR joins become
+     AND joins, loop markers are ignored; kept in the JSON under "untranslated").
+  1b. faithful translation in a second copy (data/signavio_generated_translated.bpmn); the
+     original file is not changed and the discovered behaviour is kept, only BPMN constructs PM4Py
+     does not support are rewritten with XOR/AND gateways (also in the JSON, field "translation"):
+       T0  <incoming>/<outgoing> children and the diagram (layout) removed; PM4Py takes the flow
+           endpoints from sourceRef/targetRef, the layout is not needed for the conversion
+       T1  OR1 (inclusive join, inputs XOR2 = direct online path and AND1 = bank / leads path) ->
+           exclusive join. XOR1 (online vs bank) and XOR2 (direct vs W_Handle leads) route every
+           case into exactly one of the two inputs, so the OR join only ever waits for one token.
+       T2  OR2 (inclusive join, inputs A_Concept and W_Complete application) -> parallel join.
+           On the bank / leads path AND1 starts both inputs; on the direct online path only
+           A_Concept runs, so the OR join must not wait for W_Complete application. The direct
+           flow XOR2 -> OR1 gets a parallel split that also sends a silent token to a new
+           exclusive join in front of OR2's W_Complete application input (the "silent skip").
+       T3  loop markers (standardLoopCharacteristics, testBefore=false = do-while) on
+           O_Create Offer, O_Sent, O_Cancelled -> XOR join before the task, XOR split after it,
+           back flow from the split to the join (the task runs once, then may repeat)
   2. soundness on the full reachability graph (classical definition, van der Aalst): option to
      complete, proper completion, no dead transitions, bounded within MAX_STATES markings;
      Woflan as a cross-check with a timeout. If the net is unsound, the reasons are reported
@@ -18,7 +35,7 @@ Steps
   5. comparison table: It6_c75 (final_metrics.json), Signavio re-import of the final model
      (final_signavio_metrics.json), Signavio-generated model
 
-Output: results/signavio_discovery_metrics.json
+Output: results/signavio_discovery_metrics.json, results/models/signavio_generated.pnml (translated net)
 Run:  python src/signavio_discovery_eval.py
 """
 import json
@@ -41,6 +58,7 @@ RES = ROOT / "results"
 RAW = ROOT / "data" / "signavio_bpmn.bpmn"
 SRC = RES / "models" / "signavio_generated.bpmn"
 STRIPPED = ROOT / "data" / "signavio_generated_stripped.bpmn"
+TRANSLATED = ROOT / "data" / "signavio_generated_translated.bpmn"
 OUT = RES / "signavio_discovery_metrics.json"
 MAX_STATES = 200_000
 WOFLAN_TIMEOUT = 300
@@ -189,16 +207,16 @@ def woflan(net, im, fm):
                                              wf.Parameters.PRINT_DIAGNOSTICS: False})
 
 
-def diagnosis(r: dict) -> list[str]:
-    """Why the converted net is unsound, in BPMN terms."""
+def diagnosis(r: dict, translated: bool = False) -> list[str]:
+    """Why the converted net is unsound, in BPMN terms (OR joins / loop markers only before the translation)."""
     s, out = r["structure"], []
-    for g in s["inclusive_gateways"]:
+    for g in ([] if translated else s["inclusive_gateways"]):
         if g["direction"] == "join":
             out.append(f"{g['gateway']} is an inclusive (OR) join with inputs {g['incoming']}. PM4Py translates an "
                        f"OR join like an AND join (it waits for a token on every input) and adds skip transitions "
                        f"only between an OR split and an OR join; this model has no OR split, so {g['gateway']} "
                        f"blocks every case that does not deliver a token on all of its inputs.")
-    if s["task_loop_markers"]:
+    if s["task_loop_markers"] and not translated:
         out.append(f"Loop markers (standardLoopCharacteristics) on {s['task_loop_markers']} are ignored by PM4Py's "
                    f"BPMN importer: each task fires at most once per visit in the net.")
     d = r["soundness"]
@@ -208,6 +226,107 @@ def diagnosis(r: dict) -> list[str]:
                    f"{d['first_deadlock']['marked']}. Dead visible transitions: {len(d['dead_visible_transitions'])} "
                    f"of {r['visible_transitions']}.")
     return out
+
+
+def translate(src, dst) -> list[str]:
+    """Faithful rewrite of the OR joins and loop markers (T0-T3 in the module docstring)."""
+    tree = ET.parse(src)
+    root = tree.getroot()
+    proc = root.find(B + "process")
+    nodes, succ, pred, short = bpmn_graph(src)
+    by_short = {v: k for k, v in short.items() if not v.startswith("flow ")}
+    flows = {f.get("id"): f for f in proc.iter(B + "sequenceFlow")}
+    el = {e.get("id"): e for e in proc}
+    steps, n = [], [0]
+
+    def new_id(kind):
+        n[0] += 1
+        return f"tr-{kind}-{n[0]}"
+
+    def gateway(tag, direction):
+        g = ET.SubElement(proc, B + tag, {"id": new_id(tag), "gatewayDirection": direction})
+        return g.get("id")
+
+    def flow(s, d):
+        ET.SubElement(proc, B + "sequenceFlow", {"id": new_id("flow"), "sourceRef": s, "targetRef": d})
+
+    def the_flow(s, d):
+        f = [f for f in flows.values() if f.get("sourceRef") == s and f.get("targetRef") == d]
+        assert len(f) == 1, (short[s], short[d])
+        return f[0]
+
+    # T0
+    k = 0
+    for e in proc:
+        for c in list(e):
+            if c.tag in (B + "incoming", B + "outgoing"):
+                e.remove(c)
+                k += 1
+    for d in root.findall("{%s}BPMNDiagram" % NS["bpmndi"]):
+        root.remove(d)
+    steps.append(f"T0: removed {k} <incoming>/<outgoing> references and the diagram layout (PM4Py uses "
+                 f"sourceRef/targetRef; layout not needed)")
+
+    # T1
+    or1, xor2, and1 = by_short["OR1"], by_short["XOR2"], by_short["AND1"]
+    assert set(pred[or1]) == {xor2, and1} and nodes[or1][0] == "inclusiveGateway"
+    el[or1].tag = B + "exclusiveGateway"
+    steps.append("T1: OR1 (inclusive join; inputs XOR2 = direct online path, AND1 = bank / W_Handle leads path) -> "
+                 "exclusive join: XOR1 and XOR2 route every case into exactly one of the two inputs")
+
+    # T2
+    or2, concept, wca = by_short["OR2"], by_short["A_Concept"], by_short["W_Complete application"]
+    assert set(pred[or2]) == {concept, wca} and nodes[or2][0] == "inclusiveGateway"
+    el[or2].tag = B + "parallelGateway"
+    split = gateway("parallelGateway", "Diverging")
+    join = gateway("exclusiveGateway", "Converging")
+    the_flow(xor2, or1).set("targetRef", split)
+    flow(split, or1)
+    the_flow(wca, or2).set("targetRef", join)
+    flow(join, or2)
+    flow(split, join)
+    steps.append("T2: OR2 (inclusive join; inputs A_Concept, W_Complete application) -> parallel join; the direct "
+                 "online flow XOR2 -> OR1 gets a parallel split whose second branch is a silent skip into a new "
+                 "exclusive join in front of OR2's W_Complete application input (on the bank / leads path AND1 "
+                 "already starts both inputs)")
+
+    # T3
+    looped = []
+    for i, (tag, name, loop) in nodes.items():
+        if not loop:
+            continue
+        task = el[i]
+        task.remove(task.find(B + "standardLoopCharacteristics"))
+        assert len(pred[i]) == 1 and len(succ[i]) == 1, name
+        lj, ls = gateway("exclusiveGateway", "Converging"), gateway("exclusiveGateway", "Diverging")
+        the_flow(pred[i][0], i).set("targetRef", lj)
+        the_flow(i, succ[i][0]).set("sourceRef", ls)
+        flow(lj, i)
+        flow(i, ls)
+        flow(ls, lj)
+        looped.append(name)
+    steps.append(f"T3: loop markers (standardLoopCharacteristics, testBefore=false) on {sorted(looped)} -> XOR join "
+                 f"before and XOR split after each task with a back flow (runs once, may repeat)")
+    tree.write(dst, xml_declaration=True, encoding="UTF-8")
+    return steps
+
+
+def convert(path):
+    return pm4py.convert_to_petri_net(pm4py.read_bpmn(str(path)))
+
+
+def label_check(net, acts) -> dict:
+    labels = [t.label for t in net.transitions if t.label is not None]
+    return {"visible_transitions": len(labels), "labels_not_in_log": sorted(set(labels) - acts),
+            "log_activities_not_in_model": sorted(acts - set(labels)),
+            "duplicate_labels": sorted({l for l in labels if labels.count(l) > 1})}
+
+
+def checked_soundness(net, im, fm, short) -> dict:
+    s = soundness(net, im, fm, short)
+    wf = with_timeout(woflan, (net, im, fm), WOFLAN_TIMEOUT)
+    s["woflan"] = "timeout" if wf is None else bool(wf)
+    return s
 
 
 # ---------------------------------------------------------------- main
@@ -224,40 +343,40 @@ def main():
     if RAW.exists() and (not SRC.exists() or RAW.read_bytes() != SRC.read_bytes()):
         shutil.copyfile(RAW, SRC)
     removed = strip_bpmn(SRC, STRIPPED)
-    _, _, _, short = bpmn_graph(STRIPPED)
-    bpmn = pm4py.read_bpmn(str(STRIPPED))
-    net, im, fm = pm4py.convert_to_petri_net(bpmn)
-    pm4py.write_pnml(net, im, fm, str(RES / "models" / "signavio_generated.pnml"))
-
     log, cfg = final_log()
     acts = set(log[ACT].unique())
-    labels = [t.label for t in net.transitions if t.label is not None]
-    r = {"model": "SAP Signavio Process Intelligence, Variant Explorer -> Generate BPMN (top 92 variants)",
-         "file": "results/models/signavio_generated.bpmn", "log": cfg["log"], "cases": cfg["cases"],
-         "stripped": removed, **structural(net, im),
-         "visible_transitions": len(labels), "labels_not_in_log": sorted(set(labels) - acts),
-         "log_activities_not_in_model": sorted(acts - set(labels)),
-         "duplicate_labels": sorted({l for l in labels if labels.count(l) > 1}),
-         "structure": structure(SRC), "wf_net": is_workflow_net(net)}
 
     def save(x):
         OUT.write_text(json.dumps(x, indent=2, default=str))
 
-    r["soundness"] = soundness(net, im, fm, short)
-    save(r)
-    wf = with_timeout(woflan, (net, im, fm), WOFLAN_TIMEOUT)
-    r["soundness"]["woflan"] = "timeout" if wf is None else bool(wf)
+    # PM4Py's direct conversion (kept for the report: why a translation is needed)
+    _, _, _, short = bpmn_graph(STRIPPED)
+    net0, im0, fm0 = convert(STRIPPED)
+    u = {"stripped": removed, **structural(net0, im0), **label_check(net0, acts), "structure": structure(SRC)}
+    u["soundness"] = checked_soundness(net0, im0, fm0, short)
+    u["sound"] = u["soundness"]["sound"]
+    u["diagnosis"] = diagnosis(u) if not u["sound"] else []
+    print("untranslated: sound =", u["sound"], *u["diagnosis"], sep="\n ", flush=True)
+
+    # faithful translation
+    steps = translate(STRIPPED, TRANSLATED)
+    _, _, _, short = bpmn_graph(TRANSLATED)
+    net, im, fm = convert(TRANSLATED)
+    pm4py.write_pnml(net, im, fm, str(RES / "models" / "signavio_generated.pnml"))
+    r = {"model": "SAP Signavio Process Intelligence, Variant Explorer -> Generate BPMN (top 92 variants), "
+                  "translated faithfully for PM4Py",
+         "file": "results/models/signavio_generated.bpmn", "log": cfg["log"], "cases": cfg["cases"],
+         "translation": steps, **structural(net, im), **label_check(net, acts), "structure": u["structure"],
+         "wf_net": is_workflow_net(net), "untranslated": u}
+    r["soundness"] = checked_soundness(net, im, fm, short)
     r["sound"] = r["soundness"]["sound"]
     save(r)
-    print(json.dumps({k: r[k] for k in ["places", "transitions", "silent", "visible_transitions",
-                                        "labels_not_in_log", "log_activities_not_in_model", "wf_net",
-                                        "soundness", "structure"]}, indent=1), flush=True)
+    print(json.dumps({k: r[k] for k in ["translation", "places", "transitions", "silent", "visible_transitions",
+                                        "labels_not_in_log", "wf_net", "soundness"]}, indent=1), flush=True)
 
     if not r["sound"]:
-        r["diagnosis"] = diagnosis(r)
-        r["metrics"] = ("not computed: the converted net is not sound (see soundness); the BPMN uses "
-                        "elements PM4Py does not translate faithfully (structure.inclusive_gateways, "
-                        "structure.task_loop_markers)")
+        r["diagnosis"] = diagnosis(r, translated=True)
+        r["metrics"] = "not computed: the translated net is not sound (see soundness, diagnosis)"
         r["comparison"] = table(r).to_dict()
         save(r)
         print("\n".join(r["diagnosis"]))

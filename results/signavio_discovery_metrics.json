@@ -1,20 +1,25 @@
 {
-  "model": "SAP Signavio Process Intelligence, Variant Explorer -> Generate BPMN (top 92 variants)",
+  "model": "SAP Signavio Process Intelligence, Variant Explorer -> Generate BPMN (top 92 variants), translated faithfully for PM4Py",
   "file": "results/models/signavio_generated.bpmn",
   "log": "B1c",
   "cases": 31411,
-  "stripped": {},
-  "places": 31,
-  "transitions": 50,
-  "arcs": 103,
-  "silent": 31,
-  "own_silent_share": 0.62,
-  "own_size": 184,
-  "own_cnc": 1.271604938271605,
-  "own_density": 0.0332258064516129,
-  "own_struct_approp": 0.25925925925925924,
-  "simp_arc_degree": 0.6479999999999999,
-  "simp_ext_cardoso": 52,
+  "translation": [
+    "T0: removed 136 <incoming>/<outgoing> references and the diagram layout (PM4Py uses sourceRef/targetRef; layout not needed)",
+    "T1: OR1 (inclusive join; inputs XOR2 = direct online path, AND1 = bank / W_Handle leads path) -> exclusive join: XOR1 and XOR2 route every case into exactly one of the two inputs",
+    "T2: OR2 (inclusive join; inputs A_Concept, W_Complete application) -> parallel join; the direct online flow XOR2 -> OR1 gets a parallel split whose second branch is a silent skip into a new exclusive join in front of OR2's W_Complete application input (on the bank / leads path AND1 already starts both inputs)",
+    "T3: loop markers (standardLoopCharacteristics, testBefore=false) on ['O_Cancelled', 'O_Create Offer', 'O_Sent'] -> XOR join before and XOR split after each task with a back flow (runs once, may repeat)"
+  ],
+  "places": 37,
+  "transitions": 60,
+  "arcs": 123,
+  "silent": 41,
+  "own_silent_share": 0.6833333333333333,
+  "own_size": 220,
+  "own_cnc": 1.268041237113402,
+  "own_density": 0.027702702702702704,
+  "own_struct_approp": 0.21649484536082475,
+  "simp_arc_degree": 0.651006711409396,
+  "simp_ext_cardoso": 61,
   "is_wf_net": true,
   "visible_transitions": 19,
   "labels_not_in_log": [],
@@ -79,53 +84,158 @@
     "nodes_not_on_path": 0,
     "is_wf_net": true
   },
-  "soundness": {
-    "reachable_markings": 6,
-    "bounded_within_limit": true,
-    "option_to_complete": false,
-    "proper_completion": true,
-    "no_dead_transitions": false,
-    "sound": false,
-    "markings_that_cannot_complete": 6,
-    "deadlocks": 1,
-    "dead_visible_transitions": [
-      "A_Accepted",
-      "A_Cancelled",
-      "A_Complete",
-      "A_Concept",
-      "A_Denied",
-      "A_Incomplete",
-      "A_Pending",
-      "A_Validating",
-      "O_Cancelled",
-      "O_Create Offer",
-      "O_Returned",
-      "O_Sent",
-      "W_Call after offers",
-      "W_Call incomplete files",
-      "W_Validate application"
+  "untranslated": {
+    "stripped": {},
+    "places": 31,
+    "transitions": 50,
+    "arcs": 103,
+    "silent": 31,
+    "own_silent_share": 0.62,
+    "own_size": 184,
+    "own_cnc": 1.271604938271605,
+    "own_density": 0.0332258064516129,
+    "own_struct_approp": 0.25925925925925924,
+    "simp_arc_degree": 0.6479999999999999,
+    "simp_ext_cardoso": 52,
+    "is_wf_net": true,
+    "visible_transitions": 19,
+    "labels_not_in_log": [],
+    "log_activities_not_in_model": [
+      "W_Assess potential fraud",
+      "W_Personal Loan collection",
+      "W_Shortened completion "
     ],
-    "dead_silent_transitions": 29,
-    "first_deadlock": {
-      "trace": [
-        "A_Create Application",
-        "W_Complete application"
+    "duplicate_labels": [],
+    "structure": {
+      "gateways": {
+        "XOR": {
+          "total": 22,
+          "split": 10,
+          "join": 12
+        },
+        "OR": {
+          "total": 2,
+          "join": 2
+        },
+        "AND": {
+          "total": 1,
+          "split": 1
+        }
+      },
+      "tasks": 19,
+      "task_loop_markers": [
+        "O_Cancelled",
+        "O_Create Offer",
+        "O_Sent"
       ],
-      "marked": [
-        "flow AND1 -> OR1",
-        "flow W_Complete application -> OR2"
+      "offer_loop (O_Create Offer reachable again after O_Sent)": true,
+      "validation_loop (W_Validate application reachable again after A_Incomplete)": true,
+      "inclusive_gateways": [
+        {
+          "gateway": "OR1",
+          "direction": "join",
+          "incoming": [
+            "XOR2",
+            "AND1"
+          ],
+          "outgoing": [
+            "A_Concept"
+          ]
+        },
+        {
+          "gateway": "OR2",
+          "direction": "join",
+          "incoming": [
+            "A_Concept",
+            "W_Complete application"
+          ],
+          "outgoing": [
+            "A_Accepted"
+          ]
+        }
       ]
     },
-    "woflan": false
+    "soundness": {
+      "reachable_markings": 6,
+      "bounded_within_limit": true,
+      "option_to_complete": false,
+      "proper_completion": true,
+      "no_dead_transitions": false,
+      "sound": false,
+      "markings_that_cannot_complete": 6,
+      "deadlocks": 1,
+      "dead_visible_transitions": [
+        "A_Accepted",
+        "A_Cancelled",
+        "A_Complete",
+        "A_Concept",
+        "A_Denied",
+        "A_Incomplete",
+        "A_Pending",
+        "A_Validating",
+        "O_Cancelled",
+        "O_Create Offer",
+        "O_Returned",
+        "O_Sent",
+        "W_Call after offers",
+        "W_Call incomplete files",
+        "W_Validate application"
+      ],
+      "dead_silent_transitions": 29,
+      "first_deadlock": {
+        "trace": [
+          "A_Create Application",
+          "W_Complete application"
+        ],
+        "marked": [
+          "flow AND1 -> OR1",
+          "flow W_Complete application -> OR2"
+        ]
+      },
+      "woflan": false
+    },
+    "sound": false,
+    "diagnosis": [
+      "OR1 is an inclusive (OR) join with inputs ['XOR2', 'AND1']. PM4Py translates an OR join like an AND join (it waits for a token on every input) and adds skip transitions only between an OR split and an OR join; this model has no OR split, so OR1 blocks every case that does not deliver a token on all of its inputs.",
+      "OR2 is an inclusive (OR) join with inputs ['A_Concept', 'W_Complete application']. PM4Py translates an OR join like an AND join (it waits for a token on every input) and adds skip transitions only between an OR split and an OR join; this model has no OR split, so OR2 blocks every case that does not deliver a token on all of its inputs.",
+      "Loop markers (standardLoopCharacteristics) on ['O_Cancelled', 'O_Create Offer', 'O_Sent'] are ignored by PM4Py's BPMN importer: each task fires at most once per visit in the net.",
+      "Every case deadlocks: 6 reachable markings, none reaches the final marking; e.g. after ['A_Create Application', 'W_Complete application'] the tokens wait in ['flow AND1 -> OR1', 'flow W_Complete application -> OR2']. Dead visible transitions: 15 of 19."
+    ]
   },
-  "sound": false,
-  "diagnosis": [
-    "OR1 is an inclusive (OR) join with inputs ['XOR2', 'AND1']. PM4Py translates an OR join like an AND join (it waits for a token on every input) and adds skip transitions only between an OR split and an OR join; this model has no OR split, so OR1 blocks every case that does not deliver a token on all of its inputs.",
-    "OR2 is an inclusive (OR) join with inputs ['A_Concept', 'W_Complete application']. PM4Py translates an OR join like an AND join (it waits for a token on every input) and adds skip transitions only between an OR split and an OR join; this model has no OR split, so OR2 blocks every case that does not deliver a token on all of its inputs.",
-    "Loop markers (standardLoopCharacteristics) on ['O_Cancelled', 'O_Create Offer', 'O_Sent'] are ignored by PM4Py's BPMN importer: each task fires at most once per visit in the net.",
-    "Every case deadlocks: 6 reachable markings, none reaches the final marking; e.g. after ['A_Create Application', 'W_Complete application'] the tokens wait in ['flow AND1 -> OR1', 'flow W_Complete application -> OR2']. Dead visible transitions: 15 of 19."
-  ],
-  "metrics": "not computed: the converted net is not sound (see soundness); the BPMN uses elements PM4Py does not translate faithfully (structure.inclusive_gateways, structure.task_loop_markers)",
+  "soundness": {
+    "reachable_markings": 37,
+    "bounded_within_limit": true,
+    "option_to_complete": true,
+    "proper_completion": true,
+    "no_dead_transitions": true,
+    "sound": true,
+    "markings_that_cannot_complete": 0,
+    "deadlocks": 0,
+    "dead_visible_transitions": [],
+    "dead_silent_transitions": 0,
+    "first_deadlock": null,
+    "woflan": true
+  },
+  "sound": true,
+  "t_fitness_tbr": 7.6380436248146,
+  "fitness_tbr": 0.9812902444919197,
+  "fit_traces_tbr_pct": 45.95842220878036,
+  "t_fitness_tbr_nim": 8.474342834204435,
+  "fitness_tbr_nim": 0.9812902444919197,
+  "fit_traces_tbr_nim_pct": 45.68463277195887,
+  "t_alignments": 50.744161082897335,
+  "alignments_failed": 0,
+  "fitness_align": 0.9696244388541595,
+  "fit_traces_align_pct": 45.68463277195887,
+  "generalization_align": 0.9833597958901722,
+  "precision_tbr": 0.8560730546711856,
+  "t_precision_tbr": 15.243980624945834,
+  "generalization_tbr": 0.9835158189744919,
+  "t_generalization_tbr": 4.067880292190239,
+  "precision_align": 0.8574001822736709,
+  "t_precision_align": 246.6609030829277,
+  "t_ext_cyclomatic": 1.5766802919097245,
+  "simp_ext_cyclomatic": 62,
   "comparison": {
     "It6_c75 final": {
       "places": 31,
@@ -186,33 +296,33 @@
       "t_ext_cyclomatic": 1.7795
     },
     "Signavio-generated (top 92)": {
-      "places": 31,
-      "transitions": 50,
-      "silent": 31,
-      "arcs": 103,
-      "own_size": 184,
-      "own_cnc": 1.2716,
-      "own_silent_share": 0.62,
-      "simp_arc_degree": 0.648,
-      "simp_ext_cardoso": 52,
-      "simp_ext_cyclomatic": "n/a",
+      "places": 37,
+      "transitions": 60,
+      "silent": 41,
+      "arcs": 123,
+      "own_size": 220,
+      "own_cnc": 1.268,
+      "own_silent_share": 0.6833,
+      "simp_arc_degree": 0.651,
+      "simp_ext_cardoso": 61,
+      "simp_ext_cyclomatic": 62,
       "is_wf_net": true,
-      "sound": false,
-      "fit_traces_tbr_nim_pct": "n/a",
-      "fitness_tbr_nim": "n/a",
-      "fit_traces_align_pct": "n/a",
-      "fitness_align": "n/a",
-      "alignments_failed": "n/a",
-      "precision_tbr": "n/a",
-      "precision_align": "n/a",
-      "generalization_tbr": "n/a",
-      "generalization_align": "n/a",
-      "t_fitness_tbr_nim": "n/a",
-      "t_alignments": "n/a",
-      "t_precision_tbr": "n/a",
-      "t_precision_align": "n/a",
-      "t_generalization_tbr": "n/a",
-      "t_ext_cyclomatic": "n/a"
+      "sound": true,
+      "fit_traces_tbr_nim_pct": 45.6846,
+      "fitness_tbr_nim": 0.9813,
+      "fit_traces_align_pct": 45.6846,
+      "fitness_align": 0.9696,
+      "alignments_failed": 0,
+      "precision_tbr": 0.8561,
+      "precision_align": 0.8574,
+      "generalization_tbr": 0.9835,
+      "generalization_align": 0.9834,
+      "t_fitness_tbr_nim": 8.4743,
+      "t_alignments": 50.7442,
+      "t_precision_tbr": 15.244,
+      "t_precision_align": 246.6609,
+      "t_generalization_tbr": 4.0679,
+      "t_ext_cyclomatic": 1.5767
     }
   }
 }
