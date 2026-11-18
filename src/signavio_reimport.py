@@ -50,11 +50,11 @@ COMPARE = ["places", "transitions", "arcs", "silent", "own_size", "own_cnc", "ow
            "generalization_tbr", "generalization_align", "t_alignments", "t_precision_align"]
 
 
-def strip_bpmn() -> dict:
-    """Copy of the Signavio file with only the control flow (tasks, gateways, events, sequence flows)."""
+def strip_bpmn(src=SRC, dst=STRIPPED) -> dict:
+    """Copy of a Signavio file with only the control flow (tasks, gateways, events, sequence flows)."""
     for prefix, uri in NS.items():
         ET.register_namespace("" if prefix == "bpmn" else prefix, uri)
-    tree = ET.parse(SRC)
+    tree = ET.parse(src)
     root = tree.getroot()
     removed, ids = {}, set()
     for parent in root.iter():
@@ -69,7 +69,7 @@ def strip_bpmn() -> dict:
             if child.get("bpmnElement") in ids:
                 parent.remove(child)
                 removed["diagram elements"] = removed.get("diagram elements", 0) + 1
-    tree.write(STRIPPED, xml_declaration=True, encoding="UTF-8")
+    tree.write(dst, xml_declaration=True, encoding="UTF-8")
     return removed
 
 

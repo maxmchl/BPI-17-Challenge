@@ -1,0 +1,218 @@
+{
+  "model": "SAP Signavio Process Intelligence, Variant Explorer -> Generate BPMN (top 92 variants)",
+  "file": "results/models/signavio_generated.bpmn",
+  "log": "B1c",
+  "cases": 31411,
+  "stripped": {},
+  "places": 31,
+  "transitions": 50,
+  "arcs": 103,
+  "silent": 31,
+  "own_silent_share": 0.62,
+  "own_size": 184,
+  "own_cnc": 1.271604938271605,
+  "own_density": 0.0332258064516129,
+  "own_struct_approp": 0.25925925925925924,
+  "simp_arc_degree": 0.6479999999999999,
+  "simp_ext_cardoso": 52,
+  "is_wf_net": true,
+  "visible_transitions": 19,
+  "labels_not_in_log": [],
+  "log_activities_not_in_model": [
+    "W_Assess potential fraud",
+    "W_Personal Loan collection",
+    "W_Shortened completion "
+  ],
+  "duplicate_labels": [],
+  "structure": {
+    "gateways": {
+      "XOR": {
+        "total": 22,
+        "split": 10,
+        "join": 12
+      },
+      "OR": {
+        "total": 2,
+        "join": 2
+      },
+      "AND": {
+        "total": 1,
+        "split": 1
+      }
+    },
+    "tasks": 19,
+    "task_loop_markers": [
+      "O_Cancelled",
+      "O_Create Offer",
+      "O_Sent"
+    ],
+    "offer_loop (O_Create Offer reachable again after O_Sent)": true,
+    "validation_loop (W_Validate application reachable again after A_Incomplete)": true,
+    "inclusive_gateways": [
+      {
+        "gateway": "OR1",
+        "direction": "join",
+        "incoming": [
+          "XOR2",
+          "AND1"
+        ],
+        "outgoing": [
+          "A_Concept"
+        ]
+      },
+      {
+        "gateway": "OR2",
+        "direction": "join",
+        "incoming": [
+          "A_Concept",
+          "W_Complete application"
+        ],
+        "outgoing": [
+          "A_Accepted"
+        ]
+      }
+    ]
+  },
+  "wf_net": {
+    "sources": 1,
+    "sinks": 1,
+    "nodes_not_on_path": 0,
+    "is_wf_net": true
+  },
+  "soundness": {
+    "reachable_markings": 6,
+    "bounded_within_limit": true,
+    "option_to_complete": false,
+    "proper_completion": true,
+    "no_dead_transitions": false,
+    "sound": false,
+    "markings_that_cannot_complete": 6,
+    "deadlocks": 1,
+    "dead_visible_transitions": [
+      "A_Accepted",
+      "A_Cancelled",
+      "A_Complete",
+      "A_Concept",
+      "A_Denied",
+      "A_Incomplete",
+      "A_Pending",
+      "A_Validating",
+      "O_Cancelled",
+      "O_Create Offer",
+      "O_Returned",
+      "O_Sent",
+      "W_Call after offers",
+      "W_Call incomplete files",
+      "W_Validate application"
+    ],
+    "dead_silent_transitions": 29,
+    "first_deadlock": {
+      "trace": [
+        "A_Create Application",
+        "W_Complete application"
+      ],
+      "marked": [
+        "flow AND1 -> OR1",
+        "flow W_Complete application -> OR2"
+      ]
+    },
+    "woflan": false
+  },
+  "sound": false,
+  "diagnosis": [
+    "OR1 is an inclusive (OR) join with inputs ['XOR2', 'AND1']. PM4Py translates an OR join like an AND join (it waits for a token on every input) and adds skip transitions only between an OR split and an OR join; this model has no OR split, so OR1 blocks every case that does not deliver a token on all of its inputs.",
+    "OR2 is an inclusive (OR) join with inputs ['A_Concept', 'W_Complete application']. PM4Py translates an OR join like an AND join (it waits for a token on every input) and adds skip transitions only between an OR split and an OR join; this model has no OR split, so OR2 blocks every case that does not deliver a token on all of its inputs.",
+    "Loop markers (standardLoopCharacteristics) on ['O_Cancelled', 'O_Create Offer', 'O_Sent'] are ignored by PM4Py's BPMN importer: each task fires at most once per visit in the net.",
+    "Every case deadlocks: 6 reachable markings, none reaches the final marking; e.g. after ['A_Create Application', 'W_Complete application'] the tokens wait in ['flow AND1 -> OR1', 'flow W_Complete application -> OR2']. Dead visible transitions: 15 of 19."
+  ],
+  "metrics": "not computed: the converted net is not sound (see soundness); the BPMN uses elements PM4Py does not translate faithfully (structure.inclusive_gateways, structure.task_loop_markers)",
+  "comparison": {
+    "It6_c75 final": {
+      "places": 31,
+      "transitions": 42,
+      "silent": 23,
+      "arcs": 90,
+      "own_size": 163,
+      "own_cnc": 1.2329,
+      "own_silent_share": 0.5476,
+      "simp_arc_degree": 0.6822,
+      "simp_ext_cardoso": 41,
+      "simp_ext_cyclomatic": 59,
+      "is_wf_net": true,
+      "sound": true,
+      "fit_traces_tbr_nim_pct": 89.4368,
+      "fitness_tbr_nim": 0.9952,
+      "fit_traces_align_pct": 89.4368,
+      "fitness_align": 0.9927,
+      "alignments_failed": 0,
+      "precision_tbr": 0.6998,
+      "precision_align": 0.7011,
+      "generalization_tbr": 0.9914,
+      "generalization_align": 0.9914,
+      "t_fitness_tbr_nim": 5.9043,
+      "t_alignments": 54.2006,
+      "t_precision_tbr": 15.5398,
+      "t_precision_align": 342.9854,
+      "t_generalization_tbr": 3.3407,
+      "t_ext_cyclomatic": 1.6472
+    },
+    "Signavio re-import of final": {
+      "places": 39,
+      "transitions": 50,
+      "silent": 31,
+      "arcs": 106,
+      "own_size": 195,
+      "own_cnc": 1.191,
+      "own_silent_share": 0.62,
+      "simp_arc_degree": 0.7236,
+      "simp_ext_cardoso": 49,
+      "simp_ext_cyclomatic": 69,
+      "is_wf_net": true,
+      "sound": true,
+      "fit_traces_tbr_nim_pct": 89.4368,
+      "fitness_tbr_nim": 0.9962,
+      "fit_traces_align_pct": 89.4368,
+      "fitness_align": 0.9927,
+      "alignments_failed": 0,
+      "precision_tbr": 0.6998,
+      "precision_align": 0.7011,
+      "generalization_tbr": 0.9919,
+      "generalization_align": 0.9919,
+      "t_fitness_tbr_nim": 7.0063,
+      "t_alignments": 52.8944,
+      "t_precision_tbr": 19.3853,
+      "t_precision_align": 307.7962,
+      "t_generalization_tbr": 3.9257,
+      "t_ext_cyclomatic": 1.7795
+    },
+    "Signavio-generated (top 92)": {
+      "places": 31,
+      "transitions": 50,
+      "silent": 31,
+      "arcs": 103,
+      "own_size": 184,
+      "own_cnc": 1.2716,
+      "own_silent_share": 0.62,
+      "simp_arc_degree": 0.648,
+      "simp_ext_cardoso": 52,
+      "simp_ext_cyclomatic": "n/a",
+      "is_wf_net": true,
+      "sound": false,
+      "fit_traces_tbr_nim_pct": "n/a",
+      "fitness_tbr_nim": "n/a",
+      "fit_traces_align_pct": "n/a",
+      "fitness_align": "n/a",
+      "alignments_failed": "n/a",
+      "precision_tbr": "n/a",
+      "precision_align": "n/a",
+      "generalization_tbr": "n/a",
+      "generalization_align": "n/a",
+      "t_fitness_tbr_nim": "n/a",
+      "t_alignments": "n/a",
+      "t_precision_tbr": "n/a",
+      "t_precision_align": "n/a",
+      "t_generalization_tbr": "n/a",
+      "t_ext_cyclomatic": "n/a"
+    }
+  }
+}
