@@ -1,60 +1,15 @@
 # Project context for Claude Code
 
-Max's individual **Assignment I** for *Business Process Prediction, Simulation, and Optimization* (TUM, chair I17, Henryk Mustroph / Prof. Rinderle-Ma). **Master's course.** Submission: **19 Nov 2026, 23:59, Moodle.** Counts 25 % of the grade.
-
-Deliverables: report PDF in the TUM LaTeX template (two-column, max 5 pages excl. references and appendix, English) + this public repo (link in the report).
+**Assignment I** for *Business Process Prediction, Simulation, and Optimization*
 
 Local, not versioned: `data/BPI_Challenge_2017.xes.gz` (event log) and `docs/` (assignment PDF, lecture slides, LaTeX template).
 
 ## Rules that constrain how Claude helps
 
-- GenAI: the professor relaxed the writing restriction from the assignment PDF, so Claude may help with report text. Max writes the report text himself. Keep the GenAI usage declaration in the report.
+- GenAI: the professor restricted the use of Generative AI for the assignment PDF, so Claude may not help with report text. Max writes the report text himself. Keep the GenAI usage declaration in the report.
 - Footnote every Python package/tool with a link; cite scientific literature properly.
 - Reproducibility: fix random seeds for data splits, document all ML parameters.
 - If a commercial tool computes quality metrics, a Python reimplementation is required.
-
-## Professor's answers (class, Nov 6 2026) - these override earlier assumptions
-
-- **Fitness target:** ~80 % from conformance checking is the baseline. Dropping towards 75 % is acceptable if argued with generalization. **No official precision threshold:** choose one and argue for it.
-- **Lifecycle:** remove the lifecycle state for the modelling task (it is more or less irrelevant there); for simulation it is very important. The professor himself kept only the `complete` timestamps of W_ items. Caveat from our data: most W_ items never complete (see Findings), so `complete`-only nearly removes W_Call after offers. Justify whichever W_ representation we use.
-- **Bank vs customer:** only W_ events are executed by the bank; A_ and O_ are states the bank does not directly control. Determining which events are executed by the bank is "important and cool" for this assignment. Show it with swimlanes (bank vs customer) in Signavio at the end; PM4Py cannot model swimlanes.
-- **Iterations in the data, then rediscover.** No manual editing of the Petri net. The final drawn model may come from Signavio, but the model the quality metrics are computed on must be in the code.
-- **Full log vs train/test:** computing fitness on the whole log is fine for representativeness, but the process was recorded over a long time and may have changed (governance etc.). Discuss this; a temporal split is a good way to show it.
-- **Alignments:** use multiprocessing (multiple cores) for speed. The professor expects the computation not to take very long in the end.
-- **Incomplete variants:** some variants never complete. Argue whether to include them and why (real-life log with errors and human involvement). We exclude the 98 cases without an outcome.
-- **Cases TBR cannot handle:** the final model may fit ~80 %; some cases cannot be used with token replay but can with alignments. It is acceptable to argue for removing such cases for simplicity.
-- **Decision mining:** do it on the final Petri net, after the metrics work is finished. Decision types: XOR (real options a or b), self-loops (can repeat indefinitely), loop decisions (repeat a subset). Counting loops as XOR or as a separate type is a definition choice we must argue. Expect no good rules for 80-90 % of decisions: find 2-3 decisions with really good rules and explain why the others do not work. For decisions without good rules, report the branching probabilities ("nice touch", also simulation input).
-- **Advanced analysis:** a designated SAP Signavio account (with process mining / decision mining) arrives in the week of Nov 9, so plan for Option 1.
-
-## Tasks (assignment PDF, Oct 16 2026 + lecture slides)
-
-Report structure (report/main.tex): 1 Introduction; 2 Approach and Results with 2.1 Technical Setup and Preliminaries, 2.2 Basic Analysis, 2.3 Process Model Creation and Validation (incl. decision mining), 2.4 Advanced Analysis.
-
-0. **Abstract:** task, log, findings, main results in 4-5 sentences.
-1. **Intro:** domain, origin and purpose of the log, existing BPIC'17 reports (state of the art + limitations). Source: https://ais.win.tue.nl/bpi/2017/challenge.html
-2. **2.1 Technical setup:** libraries, visualization, modeling tools (footnotes).
-3. **2.2 Basic analysis** - DONE (`src/stats.py`, `results/basic_stats.tex`; W_ statistics `src/w_stats.py`, `results/w_stats.tex`). Required table plus at least 2 extra statistics; also typical vs long vs short cases.
-4. **2.3 Process model:**
-   - At least 2 discovery algorithms, models in the appendix.
-   - All PM4Py quality metrics, plus at least 2 self-implemented simplicity metrics.
-   - **Compare token-based replay vs alignments** (fitness and precision, including runtimes). Find a concrete trace where token replay is misled (silent transitions / a deviation causing follow-up missing/remaining tokens) while the alignment explains it with one cheap move.
-   - Final model replays ~80 % of cases (report % of fitting traces AND the fitness value; justify the interpretation).
-   - Trade-off discussion along slide 32 (Process Mining II) and slide 36: academic vs consulting/automation perspective. **Grading focuses on why metrics were prioritized.** Professor: precision > generalization (discrete, ordered behaviour space), but still report generalization (unseen decision combinations in simulation). Simplicity: discuss quantitatively and qualitatively.
-   - Keep an **iteration log** (`results/iterations.csv`): one row per model version (data change + rediscovery -> fitness / precision / generalization / simplicity). This table is the "step by step" design story the graders want. Planned steps: base IMf 0.10 on log A -> merge vs keep the two O_Sent labels -> log B with W_ work items -> optional: collapse direct repeats / filter non-alignable variants.
-   - Multiple offers per application need a loop around the whole offer block (27 % of cases). IMf keeps that loop up to noise 0.10 and filters it from 0.15 on (see Findings).
-   - Temporal generalization check: discover on cases started Jan-Jun 2016, evaluate on Jul-Dec.
-   - Final BPMN 2.0 remodeled block-structured (SAP Signavio modeler or bpmn.io), exported as BPMN XML, **re-imported into PM4Py and re-evaluated** so the metrics belong to exactly that model. Task names must match log activity labels. Put the BPMN in the report as a PDF figure.
-   - **Order matters:** do the Signavio remodel BEFORE decision mining. If the remodel changes the structure, the XORs (decision points) change too.
-   - Alignments are the compute bottleneck: develop on a sample or the top variants, run the full log only for final numbers; use timeouts/multiprocessing.
-   - PM4Py may need local patches (slide 37); document any patch in the repo.
-5. **Decision mining (mandatory for Master's, in 2.3):** alignment-based (de Leoni & van der Aalst 2013) on the final Petri net, rules visualized on the BPMN (text annotations at the gateways). Per the professor: classify decision points (XOR / self-loop / loop decision), find 2-3 with good rules, give branching probabilities for the rest and explain why no rule works. Candidates: channel online vs bank (ApplicationType = Limit raise -> bank); outcome after validation (Pending / Denied / Incomplete); return vs cancel after A_Complete is driven by the 30-day timer, so expect no attribute rule.
-   - Motivation (professor): XORs introduce uncertainty; a simulation needs a branching rule at each one.
-   - PM4Py's built-in decision mining uses token replay, so implement the alignment-based extraction ourselves: align each trace, find the branch taken after each decision place (next visible sync/model move), label = branch.
-   - Features: case attributes (LoanGoal, ApplicationType, RequestedAmount) + event/offer attributes known before the decision (CreditScore, OfferedAmount, MonthlyCost, NumberOfTerms, ...); optionally long-tail features from slide 48 (last k resources, elapsed/waiting times, counts). Fixed seed, held-out split, shallow trees.
-   - Leakage: CreditScore, Selected and Accepted are recorded at O_Create Offer but reflect later outcomes (van der Ham 2017); use only features known before the decision.
-   - **Slide 52 (mandatory):** compare decision trees vs neural networks + XAI (Park et al. 2022), only on the 2-3 good decision points. Plan: per decision point, a shallow DT (rules), an MLP + SHAP, and a surrogate DT on the MLP predictions. Report accuracy, surrogate fidelity, and agreement between SHAP features and tree splits; argue explainability vs accuracy.
-6. **Tooling rules:** list every commercial tool used and include screenshots of results (also for Signavio).
-7. **2.4 Advanced: Option 1** (SAP Signavio Process Mining Suite, designated account from the professor in the week of Nov 9): repeat 2.3 there, conformance checking and decision mining if possible, usability/visualization comparison with PM4Py, when to build yourself vs use a commercial suite, assessment of the simulation feature. Screenshots required. Drift (June 2016 jump) stays relevant for the temporal generalization check.
 
 ## Findings so far (from `results/extra_stats.json`)
 
@@ -110,22 +65,6 @@ Report structure (report/main.tex): 1 Introduction; 2 Approach and Results with 
 - **W_ statistics** (`results/w_stats.*`): W_ = 63.9 % of all events; 4.07 +- 2.11 work items started per case; e.g. W_Call after offers ends in ate_abort 89.8 %, W_Handle leads in withdraw 82.2 %.
 - **Exploration W_ complete** (`src/explore_w_complete.py`, `results/explore_w_complete{.csv,_best.json}`, `figures/explore_w_complete_pareto.pdf`; not in the iteration log): 360 configs (logs C, C without duplicates, without rare W_, only W_ in >= 50 % of cases, clustered events, each +/- collapsed repeats; IM coverage 40-80 %, IMf, ILP, HM). Precision 0.8 with >= 80 % fitting is **not reachable**: the Pareto front drops from 0.899 at 72.7 % to 0.740 at 76.7 %. Best >= 80 %: C-W50 + collapsed repeats, IM c70, 87.7 % fitting, precision 0.729 (alignments), but it keeps only W_Complete application and W_Assess potential fraud and lacks W_Call after offers, W_Call incomplete files, W_Handle leads and W_Validate application, so it cannot serve the simulation / bank-vs-customer question. HM is never sound; ILP is precise only below 75 % fitting.
 
-## Page budget (5 pages)
-
-Abstract + intro ~0.6, setup ~0.3, statistics ~0.6, process model ~2, decision mining ~0.6, advanced ~0.8. Everything else goes to the appendix (discovered models, extra figures). Draft intro and setup while the analysis runs, not at the end.
-
-## Plan
-
-| Dates | Work |
-|---|---|
-| Nov 4-5 | DONE: repo, statistics, literature, discovery (IM, IMf, HM), IMf sweep |
-| Nov 10-11 | DONE: log B1/B1c, iteration log, TBR rerun (PM4Py bug), temporal split, final model It6_c75, decision point inventory |
-| Nov 11-12 | Signavio remodel with three swimlanes (Customer / Bank employees / System), re-import + re-evaluate |
-| Nov 14 | DONE: decision mining D10/D6/D9 (DT + MLP/SHAP + surrogate, leakage and resource/time runs), BPMN guard texts, trade-off panels, CSV check |
-| from Nov ~11 | Option 1 in Signavio, in parallel, once the account arrives |
-| Nov 14-17 | Writing, trade-off section, declaration, README |
-| Nov 18-19 | Buffer; submit by Nov 19, 23:59 |
-
 ## Conventions
 
 - Scripts in `src/`, one per report section; tables in `results/`, figures in `figures/` (PDF for the report).
@@ -133,5 +72,3 @@ Abstract + intro ~0.6, setup ~0.3, statistics ~0.6, process model ~2, decision m
 - Python env: `.venv` is a symlink to `~/.venvs/bpic17` (venv refuses paths containing `:`).
 - `python src/load.py` caches the log as `data/bpic17.parquet`; other scripts call `load_log()`.
 - Reproduce order: load -> stats -> figures_stats -> w_stats -> preprocess (redundancy check) -> discovery -> imf_sweep -> tbr_rerun -> conformance_examples -> iterations -> final_choice -> temporal -> final_model -> conformance_examples final -> decision_points -> decision_mining -> bpmn_annotations -> (Signavio remodel) signavio_reimport -> top10_variant_conformance -> signavio_discovery_eval; tradeoff_panels after final_choice; export_signavio after final_choice (Signavio CSVs in data/, not versioned); csv_xes_check anytime. Long runs write their JSON incrementally and skip finished rows.
-- Figures: one-column width 3.4 in, serif font, validated categorical palette `#2a78d6 #eb6834 #1baf7a #eda100` (fixed order).
-- Max prefers complete, runnable scripts and concise prose; explain concepts with concrete numbers first.
