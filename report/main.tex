@@ -23,16 +23,16 @@
   twocolumn,      % use onecolumn or twocolumn layout
 ]{tumarticle}
 
-\usepackage{cite}
-
 % Add packages here:
 \usepackage{booktabs}
+\usepackage{cite}
+\usepackage{cuted}
 
 % article metadata
-\title{First Assignment - Business Process Prediction, Simulation, and Optimization - Summer Semester 2026}
+\title{First Assignment - Business Process Prediction, Simulation, and Optimization - Winter Semester 2026/2027}
 \subtitle{Process and Data Science on the BPIC-17 Event Log}
 
-\author[email=author@tum.de]{Author (add your information here)}
+\author[email=maximilian.michel@tum.de]{Author (Maximilian Alexander Michel)}
 
 \date\today
 
@@ -41,89 +41,210 @@
 \maketitle
 
 \begin{abstract}
-tbd.
+This report investigates the loan application process of a Dutch financial institution, published as the event log of the BPI Challenge 2017, in order to build a base model for business process simulation. Starting from 1.2 million events, the log is iteratively reduced to the states of applications, offers, and the work items started by bank employees, and the models of three discovery algorithms are compared via token-based replay and alignments. Refining the data step by step yields a final model that replays 89.4\,\% of all cases perfectly at a fitness of 0.99 and a precision of 0.70, while simultaneously separating the work of the bank from the behaviour of its customers and an automated system account. The alignment-based decision mining delivered clear rules for only three of 14 decisions, while the remaining routing, captured as branching probabilities, depends on customer responses. A comparison with SAP Signavio shows that the commercial suite visualizes the process well, but can neither measure model quality nor learn decision rules. 
 \end{abstract}
 %
 
 \section{Introduction}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
-incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis 
-nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore 
-eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt 
-in culpa qui officia deserunt mollit anim id est laborum.
+Process mining turns event data recorded by information systems into insights about how processes are actually executed~\cite{vanderaalst2016}. For data-driven business process simulation, such an as-is model is the starting point, as it defines which activities occur, in which order, and where decisions are made. This report builds such a model for the loan application process of a Dutch financial institution, as published by the Business Process Intelligence Challenge (BPIC) 2017~\cite{bpic17_data}. 
 
-Example citation \cite{doe2020example}.
+The explored log contains all 31,509 loan applications filed in 2016 and their handling until 1 February 2017, with 1,202,267 events and 42,995 offers. It combines three entity types: application states (A\_), offer states (O\_) and workflow items (W\_), i.e.\ the work steps of bank employees, each with a lifecycle (e.g.\ start, suspend, complete). 
+
+The process owner asked about the throughput times, the effect of requests for missing documents, and the effect of multiple offers~\cite{bpic17_challenge}. The submitted reports agree that most of the throughput time is spent waiting for the customer and that applications without a reply are cancelled automatically after about 30 days~\cite{smith2017axis,scheithauer2017metafinanz,povalyaeva2017density}; the effect of document requests remains disputed, as the reports define conversion differently. Their process models, however, mainly illustrate the process. A model for simulation must replay most cases, balance precision and generalization, and provide explicit rules at its decision points.
+
+This report builds such a model in a reproducible Python pipeline. After an analysis of the log (Section~\ref{sec:basic}), models are discovered with the help of three algorithms, compared using token-based replay and alignment-based replay, and refined iteratively through changes to the data. The final model separates activities between customers, bank employees and the system, with its stability tested over time (Section~\ref{sec:model}). Afterwards, decision rules at the gateways are mined (Section~\ref{sec:dm}), and Section~\ref{sec:advanced} compares the approach with SAP Signavio Process Intelligence. 
+
 
 \section{Approach and Results}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
-incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis 
-nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore 
-eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt 
-in culpa qui officia deserunt mollit anim id est laborum.
+
+The goal is a model that replays most cases, separates the bank's work from
+the customers' behaviour, and specifies how cases branch at each decision. Code, parameters and results are publicly available.\footnote{Repository \url{https://github.com/maxmchl/BPI-17-Challenge}}
 
 \subsection{Technical Setup and Preliminaries}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
-incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis 
-nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore 
-eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt 
-in culpa qui officia deserunt mollit anim id est laborum.
+The analysis uses Python 3.13\footnote{Python \url{https://www.python.org}} with PM4Py\footnote{PM4Py \url{https://pm4py.fit.fraunhofer.de}} for process discovery and conformance checking, pandas\footnote{Pandas \url{https://pandas.pydata.org}} and NumPy\footnote{NumPy \url{https://numpy.org}} for data handling, scikit-learn\footnote{Scikit learn \url{https://scikit-learn.org}} and SHAP\footnote{SHAP \url{https://shap.readthedocs.io}} for decision mining, and matplotlib\footnote{Matplotlib \url{https://matplotlib.org}} for figures. The final BPMN model is drawn with the help of SAP Signavio Process Manager.\footnote{SAP Signavio Process Manager \url{https://www.signavio.com}}
 
-Example footnote: 
-Python \footnote{\tiny Python \url{https://www.python.org}}
+Generative AI tools accelerated the experimentation and development stages. Explicitly, Claude (Anthropic)\footnote{Claude (Anthropic) \url{https://claude.ai}} was used in the web chat to discuss and analyze past BPIC reports, formatting and the appendix, and Claude Code \footnote{Claude Code \url{https://claude.com/claude-code}} throughout the experimentation steps. In order to ensure scientific integrity, all Generative AI code was manually verified by the author and the random execution seeds were locked to 42. 
 
-\subsection{Basic Analysis}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
-incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis 
-nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore 
-eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt 
-in culpa qui officia deserunt mollit anim id est laborum.
+\subsection{Basic Analysis and Data Preparation}\label{sec:basic}
+The initial exploration of the unfiltered data log revealed 31,509 cases with 1,202,267 events (Table~\ref{tab:statistics}). With 15,930 variants, it means that almost every second case follows its own path. This variety is mostly derived from the lifecycle transitions of W\_ items. These items make up 63.9\,\% of all events with $4.1 \pm 2.1$ work items started per case, and each of those items can be scheduled, started, suspended, resumed and ended several times.
 
-Example table \ref{tab:statistics}:
-\begin{table}[h]
-    \caption{Basic Event Log Statistics}
-    \centering
-    \renewcommand{\arraystretch}{1.3}
-    \begin{tabular}{lr}
-        \toprule
-        \textbf{Metric} & \textbf{Value} \\
-        \midrule
-        Number of Cases & $X$ \\
-        \bottomrule
-    \end{tabular}
-    \label{tab:statistics}
+This report uses the XES file for the BPIC 17 Challenge published by 4TU~\cite{bpic17_data}, and the raw log is prepared in two steps. First, the 98 cases which never reach one of the end states A\_Pending, A\_Denied or A\_Cancelled are removed. Second, A\_ and O\_ events are kept at the lifecycle \texttt{complete}, and each W\_ item by its \texttt{start} event, the moment an employee begins it, since most work items never complete (e.g.\ W\_Call after offers reaches \texttt{complete} in only 1\,\% of the cases). The prepared log keeps 41\,\% of the events but only 23\,\% of the variants, and the mean case length drops from 38 to 16 events, while the case durations remain almost unchanged. The data preparation therefore removes the noise of the lifecycle transitions rather than process behaviour. Figure~\ref{fig:coverage} displays the same effect, i.e.\ to cover 80\,\% of the cases, one needs 9,629 variants in the raw log but 207 after the preparation. 
+
+The outcome shapes the case duration (Figure~\ref{fig:duration} in the appendix). The approved and denied applications end after a median of about two weeks, while the cancelled applications comprise 33\,\%, with clusters around 30--32 days, which is the result of an automatic cancellation when the customer does not reply~\cite{smith2017axis,povalyaeva2017density}. Long cases, on the other hand, are mostly negotiation cases where the slowest 10\,\% take more than 35 days with 1.9 offers on average, compared with 1.2 offers in the fastest 10\,\%, and half of them end as cancelled. 
+
+\begin{table}[t]
+  \caption{Event log statistics of the raw log and of the log used for
+  modelling (Section~\ref{sec:basic}).}
+  \centering\small
+  \setlength{\tabcolsep}{3pt}
+  \renewcommand{\arraystretch}{1.1}
+  \begin{tabular}{lrr}
+    \toprule
+    \textbf{Metric} & \textbf{Raw} & \textbf{Modelling} \\
+    \midrule
+    Cases            & 31,509 & 31,411 \\
+    Events           & 1,202,267 & 495,289 \\
+    Variants         & 15,930 & 3,629 \\
+    Offers           & 42,995 & 42,815 \\
+    \midrule
+    Case attributes  & \multicolumn{2}{r}{4} \\
+    Event attributes & \multicolumn{2}{r}{15} \\
+    Categorical ev.\ attr. & \multicolumn{2}{r}{7$^*$} \\
+    \midrule
+    Mean length      & 38.16 & 15.77 \\
+    Std.\ dev.\ length & 16.72 & 5.02 \\
+    Min length       & 10 & 6 \\
+    Median length    & 35 & 15 \\
+    Max length       & 180 & 53 \\
+    \midrule
+    Mean duration    & 21d 21h 35m 26s & 21d 20h 27m 13s \\
+    Std.\ dev.\ duration & 13d 4h 3m 42s & 12d 22h 40m 37s \\
+    \bottomrule
+  \end{tabular}\\[2pt]
+  {\footnotesize $^*$ plus the identifiers EventID and OfferID.}
+  \label{tab:statistics}
 \end{table}
 
-\subsection{Process Model Creation and Validation}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
-incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis 
-nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore 
-eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt 
-in culpa qui officia deserunt mollit anim id est laborum.
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/variant_coverage.pdf}
+  \caption{Share of cases covered by the most frequent variants for the raw
+  log and different event abstractions.}
+  \label{fig:coverage}
+\end{figure}
 
-Example process model as BPMN 2.0 \ref{fig:bpmn}:
-\begin{figure*}[t]
-    \centering
-    \includegraphics[width=\textwidth]{figures/example_BPMN.png}
-    \caption{Example BPMN.}
-    \label{fig:bpmn}
-\end{figure*}
+\subsection{Process Model Creation and Validation}\label{sec:model}
 
-\subsection{Advanced Analysis}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
-incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis 
-nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore 
-eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt 
-in culpa qui officia deserunt mollit anim id est laborum.
+\paragraph{Discovery and conformance checking.}
+This report first applies the Inductive Miner (IM)~\cite{leemans2013im}, the Inductive Miner infrequent (IMf, noise threshold 0.2)~\cite{leemans2014imf}, and the Heuristics Miner (HM, PM4Py defaults)~\cite{weijters2006hm} to the A\_ and O\_ events and evaluates them with token-based replay (TBR)~\cite{rozinat2008tbr} and alignments~\cite{adriansyah2011align} (Table~\ref{tab:models}; models in Figures~\ref{fig:im}--\ref{fig:hm} in the appendix). The IM replays every case but simultaneously allows almost any order: 48 of its 66 transitions are silent, while its precision~\cite{munozgama2010etc} is 0.46 and its extended cyclomatic complexity reaches 77,728. IMf fits only 62.3\,\% of the cases. HM
+gets stuck after O\_Created on the most frequent trace (5,094 cases). Its precision of 0.99 is therefore meaningless, due to the fact that a model that blocks allows almost no behaviour that could be penalized.
 
+On the sound IMf model, TBR and alignments agree almost exactly on fitness and precision, while TBR is 8--13 times faster. However, they differ in three ways. First, a single deviation can mislead TBR. In a variant of 38 cases, one substituted O\_Sent label costs the alignment one log and one model move (fitness 0.895), whereas TBR ends with three missing and four remaining tokens (fitness 0.789). Second, TBR never fires two silent self-loops which are used by alignments, thereby lowering its generalization from 0.991 to 0.940. Third, with PM4Py's default settings, TBR counts 193 cases as fitting that contain an activity missing from the model. The report therefore relies on alignment-based fitting cases throughout the analysis and uses TBR precision only for screening. 
 
-%
+\paragraph{Iterative refinement.}
+As mentioned above, the data is iteratively refined and the model rediscovered each time. The net itself was never edited by hand (Table~\ref{tab:iterations} in the appendix). Lowering IMf's noise threshold to 0.10 raised the fitting cases from 62.3\,\% to 88.7\,\% (Figure~\ref{fig:imfsweep}). The jump between the noise thresholds 0.15 and 0.10 is exactly the loop around the offer block, since 27\,\% of the applications receive more than one offer, and IMf filters this loop from a noise threshold of 0.15 on. Merging the two O\_Sent labels, which differ only in the channel, raises the fitting cases further to 93.0\,\% with an identical net. 
+
+Adding the bank's work items (Section~\ref{sec:basic}) lowers IMf's precision to 0.43, because employees interact with the work items while the application and its offer change their states, so the same step reappears in many orders, and IMf allows for far more behaviour than observed. Instead of filtering rare relations between single activities, the report thus filters for whole cases. The model is only discovered from the most frequent variants, but it is evaluated on all cases. Similar to a training and testing set in machine learning, this separates
+learning from testing and keeps rare cases visible. Finally, O\_Created, O\_Accepted and O\_Refused are dropped, as they only repeat information contained in other events, which makes the model smaller without losing information.
+
+The choice of the final model undergoes two stages. First, the purpose decides which log to use, since a simulation needs the bank's work steps, and the model should reflect which work items are executed. Second, within the chosen log, the most precise model is chosen, while still replaying at least 80\,\% of the cases. The precision is only compared within the same log, because it depends on which activities a log contains. The selected model is discovered from the variants that cover 75\,\% of the cases (Figures~\ref{fig:tradeoff} and~\ref{fig:coveragetradeoff}).
+
+\begin{table}[ht]
+  \caption{Quality metrics of the discovered models (A\_/O\_ events) and of
+  the final model (modelling log). TBR = token-based replay,
+  align.\ = alignments.}
+  \centering\small
+  \setlength{\tabcolsep}{3pt}
+  \renewcommand{\arraystretch}{1.1}
+  \begin{tabular}{lrrrr}
+    \toprule
+    \textbf{Metric} & \textbf{IM} & \textbf{IMf} & \textbf{HM} & \textbf{Final}$^c$ \\
+    \midrule
+    Fitting cases [\,\%]       & 100.0 & 62.3 & 0.0$^a$ & 89.4 \\
+    Fitness (align.)         & 1.000 & .958 & .738 & .993 \\
+    Fitness (TBR)            & 1.000 & .970 & .862 & .996 \\
+    Precision (align.)       & .462 & .625 & .989 & .701 \\
+    Precision (TBR)          & .462 & .624 & .992 & .700 \\
+    Generalization (align.)  & .961 & .991 & .828 & .992 \\
+    Generalization (TBR)     & .961 & .940 & .956 & .991 \\
+    \midrule
+    Arc degree               & .665 & .697 & .557 & .724 \\
+    Ext.\ cyclomatic         & 77,728 & 85 & --$^b$ & 69 \\
+    CNC$^*$                  & 1.25 & 1.22 & 1.40 & 1.19 \\
+    Silent transitions$^*$   & 73\,\% & 56\,\% & 59\,\% & 62\,\% \\
+    \midrule
+    Runtime align.\ [s]      & 1,169 & 36 & 193 & 54 \\
+    \bottomrule
+  \end{tabular}\\[2pt]
+  {\footnotesize $^*$ own implementation. $^a$ 3 cases; 41 alignments timed
+  out. $^b$ not computable within 120\,s. $^c$ BPMN remodelled in SAP
+  Signavio, re-imported into PM4Py.}
+  \label{tab:models}
+\end{table}
+
+\paragraph{Final model and trade-offs.}
+The final model replays 89.4\,\% of the cases perfectly while achieving a fitness of 0.993 with a precision of 0.70 (Table~\ref{tab:models}, Figure~\ref{fig:bpmn}; Petri net in Figure~\ref{fig:finalpn} in the appendix). Assigning each activity to the triggering party yields three swim lanes: the customer, who applies and returns the signed offer; the bank employees, who carry out all the work items; and the system account User\_1, which performs automatic state changes such as cancellation after 30 days~\cite{rodrigues2017stairway}. Remodelled in SAP Signavio with lanes and re-imported into PM4Py, the model accepts the same traces, i.e.\ fitness and precision remain unchanged. Converting its gateways adds eight silent transitions. Cases with a single offer almost always fit, while cases with repeated negotiations, i.e.\ several rounds of offers, result in increasing deviation, depicting the model's main limitation. 
+
+The four quality criteria cannot be maximized simultaneously~\cite{vanderaalst2016}. Their priority follows the model's purpose. The fitness is a constraint, since a simulation can only reproduce behaviour its model replays, so at least 80\,\% of cases must fit. Above this threshold, precision is the objective, because every path that the model allows but the log on the other hand never shows could produce unrealistic simulation cases. As the aforementioned work items run in parallel to the application states and 31,000 cases cannot contain every order of parallel steps, some unobserved behaviour is legitimate (precision $<$ 1.00). Models with a higher precision either leave out most of the bank's work steps or fit fewer than 80\,\% of cases (Figure~\ref{fig:pareto}). Generalization is high for all models, since almost every transition is used thousands of times, so it hardly distinguishes them and ranks below precision. Simplicity serves as tie-breaker, among the models in Table~\ref{tab:models},
+the final model has the lowest extended cyclomatic complexity (69) and CNC
+(1.19), keeping it readable. From an academic standpoint, the final model represents the best balance between fitness and precision within the given log, while a consultant might argue that it covers most of the applications with a readable model that allows for the bank's work to remain visible. 
+
+\paragraph{Generalization over time.}
+A model discovered on a whole year assumes that the process did not change within it. In order to test for this, a model discovered on the first half of 2016 is evaluated against the second half, and vice versa. Both replay most cases of the other half, indicating a largely stable control flow. However, the model of the first half is looser, while the model of the second half is stricter and fits the earlier cases of the first half less well (Figure~\ref{fig:monthly}). The process becomes more regular over the analyzed year, which is in line with the sharp increase in applications in June 2016 (Figure~\ref{fig:arrivals}). Povalyaeva et al.\ found no structural change~\cite{povalyaeva2017density}, so part of the difference may also come from filtering each half separately.
+
+\subsection{Decision Mining}\label{sec:dm}
+Every decision point introduces uncertainty, as a simulation has to know which branch a case takes. Decision mining resolves this by learning a rule for each decision from the available data. The final model contains 14 decision points: exclusive choices (XOR), self-loops, in which one activity can repeat, and loop decisions, in which a whole block is repeated, e.g.\ a new round of offers (Table~\ref{tab:dpoints} in the appendix). Eight are business decisions and the others skip an optional activity or follow directly from the outcome.
+
+\paragraph{Approach.}
+Following de Leoni and van der Aalst~\cite{deleoni2013}, every case is aligned with the model, and for each visit of a decision point the branch taken and everything known about the case at that moment are recorded (e.g.\ its attributes, the last offer, the number of previous offers, incomplete rounds, work items, and the elapsed time). CreditScore, Selected and Accepted are excluded, since they are recorded earlier but describe the later outcome~\cite{vanderham2017}. Based on this, a shallow decision tree is trained, which yields readable rules. For comparison, a small neural network is explained with SHAP~\cite{lundberg2017shap} as proposed by Park et al.~\cite{park2022}. All models are evaluated on unseen cases (Table~\ref{tab:dm}).
+
+\begin{table}[ht]
+  \caption{Decision mining on unseen cases (70/30 split by case, seed 42):
+  balanced accuracy of the majority baseline, the decision tree (DT, depth 3,
+  balanced) and the neural network (NN, MLP 32/16), and agreement of the NN
+  with its surrogate tree (fidelity, depth 3).}
+  \centering\small
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{lrrrr}
+    \toprule
+    \textbf{Decision} & \textbf{Base} & \textbf{DT} & \textbf{NN} & \textbf{Fidel.} \\
+    \midrule
+    Channel (online/bank) & .50 & .77 & .77 & 1.00 \\
+    Call after offers     & .50 & .99 & .98 & .99 \\
+    Outcome               & .33 & .77 & .69 & .97 \\
+    Outcome with leakage  & .33 & .91 & .91 & .94 \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:dm}
+\end{table}
+
+\paragraph{Rules.}
+As anticipated, clear rules exist only for a few decisions. Limit raises and new credits with very small requested amounts are always entered by the bank, whereas larger new credits arrive through both channels, which limits the accuracy (Table~\ref{tab:dm}). The first offer of an application always triggers a W\_Call after offers, but further offers made while earlier work is still open do not. Therefore, the call belongs to a round of offers and not to a single offer. The outcome is only partly predictable. Applications which stay stale for 30 days are cancelled, which reflects the 30-day timer rather than a business rule. Applications which proceeded through a round of missing documents are mostly approved, while denials remain hard to predict.
+
+The branches for the remaining decisions, such as a further round of offers or another validation round, are not separated by attributes, as they depend on customer responses and non-recorded information. For them, the model contains the observed branching probabilities as simulation input (Figure~\ref{fig:bpmn}; Table~\ref{tab:dpoints} in the appendix).
+
+\paragraph{Decision trees versus neural networks.}
+Neural networks are expected to predict better but explain worse. On this log, the network matches the tree on the channel and the call, and is worse on the outcome, where it favours the frequent classes. A surrogate tree reproduces its predictions almost perfectly, and SHAP points to the features the tree already uses (Figure~\ref{fig:shap}a--c in the appendix). Instead, SHAP proves useful when checking for leakage. When CreditScore, Selected and Accepted are included, both models predict the outcome well, and SHAP ranks CreditScore first (Figure~\ref{fig:shap}d), which immediately exposes the leakage. Therefore, the aforementioned rules are learned without these features. 
+
+\section{Advanced Analysis}\label{sec:advanced}
+The modelling log was re-explored and re-analyzed in SAP Signavio Process Intelligence\footnote{SAP Signavio Process Intelligence \url{https://www.signavio.com/products/process-intelligence/}}, by uploading it as a CSV with the corresponding BPMN linked as reference model. Signavio reproduces the case and variant counts exactly, but the import noticeably took about 40 minutes, while involving several configuration steps, compared with one line of code in PM4Py (screenshots in Appendix~\ref{sec:app_signavio}).
+
+\paragraph{Discovery and conformance.}
+The process discovery simplifies solely by frequency. With all activities shown, it displays at least 79\,\% of the paths, as a near-linear structure without loops and parallel work items (Figure~\ref{fig:sig_discovery}). The new offer loop, passed by 27\,\% of applications, is only revealed at 94\,\% of paths, together with many rarer edges, and no quality measure guides the setting (Figure~\ref{fig:sig_discovery}). A BPMN generated from the same 92 variants as the final model (Figures~\ref{fig:sig_variants} and~\ref{fig:signaviogen}) uses OR-joins and loop markers that PM4Py cannot directly replay. After a faithful manual translation, it is more precise (0.86) but fits only 45.7\,\% of cases, as W\_Complete application is only reachable via the bank or lead path. Without such a metric, Signavio offers no basis for an iterative refinement, so the comparable model is the final BPMN, remodelled in Process Manager. Signavio reports back a conformance per event of 99.9\,\%, compared with 89.4\,\% fitting cases from alignments (Figure~\ref{fig:signavio}a). Thus, Signavio only checks whether an event's activity exists in the model and not whether the case ran through it (Figure~\ref{fig:sig_fraud}). A case that repeats W\_Complete application, which the model allows only once, is shown as conforming (Figure~\ref{fig:signavio}b), while the alignment rejects it (fitness 0.938).
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/signavio_conformance.png}
+  \caption{Conformance in SAP Signavio: (a) share of conforming events,
+  (b) variant 138 with a repeated W\_Complete application, shown as
+  conforming although the alignment rejects it.}
+  \label{fig:signavio}
+\end{figure}
+
+\paragraph{Decisions.}
+The root cause analysis explains the cycle time by categorical case attributes (Figure~\ref{fig:sig_rca}). Its only cause is the outcome, which is only known at the end of a case, which depicts the leakage that decision mining avoids. Without it, no attribute explains the cycle time. Signavio does not offer decision mining. Instead, with the help of a SIGNAL query, the channel rule established in Section~\ref{sec:dm} can be checked. All limit raises and almost all new credits up to 1,300 are entered by the bank (Figure~\ref{fig:sig_signal}). This query, however, only confirms a rule already established. Signavio does not find the attribute or the threshold itself.
+
+\paragraph{Simulation.}
+Signavio's simulation suits what-if questions on a known process, e.g.\ staffing or cost scenarios, and is quick to set up. However, it accepts only fixed probabilities, drawn independently at each gateway. With the  probabilities of Table~\ref{tab:dpoints} (Figure~\ref{fig:sig_scenario}), 1,040 simulated cases achieve a reproducibility of the activity frequencies within 2\,\% of the log (Figure~\ref{fig:sig_run}), but contain 1,053 end states, as cancellation events are drawn independently of the outcome (Figure~\ref{fig:sig_report}). The previously mined rules, which would couple these decisions, cannot be entered, and durations and resources must be set by hand. 
+
+\paragraph{Build or buy.}
+Nevertheless, Signavio is faster for exploration and communication, as variants can be overlaid on the BPMN with the time between steps (Figure~\ref{fig:sig_overlay}), without any code. However, a simulation base model needs measurable quality, which only the own pipeline provides. It computes fitness, precision and generalization, explains case deviations and learns decision rules. In practice, a model should be built and checked in code and presented
+in Signavio.
+
+\begin{strip}
+  \vspace{\baselineskip}
+  \centering
+  \includegraphics[width=\textwidth,trim=48 129 49 97,clip]{figures/final_bpmn.pdf}
+  \captionof{figure}{Final process model as BPMN~2.0 (SAP Signavio) with the lanes
+  System, Customer and Bank employees, the decision rules at the channel
+  (D10), call (D6) and outcome (D9) gateways, and the branching probabilities
+  at the remaining gateways (Table~\ref{tab:dpoints}).}
+  \label{fig:bpmn}
+\end{strip}
+\vspace*{\fill}\pagebreak\clearpage
+
 \bibliographystyle{plain} 
 \bibliography{references}
+\input{appendix}
 
 \end{document}
